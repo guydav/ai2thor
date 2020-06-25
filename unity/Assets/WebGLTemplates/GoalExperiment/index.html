@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | AI2-Thor</title>
+      <script>
+        window.game_build = ".";
+        window.game_url =  "%UNITY_WEBGL_BUILD_URL%";
+        // document.onmousedown = function() {window.focus();};
+      </script>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="TemplateData/style.css">
+<!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.10.2/underscore-min.js" crossorigin="anonymous"></script> -->
+
+    <!-- <script src="TemplateData/scripts/UnityProgress.js"></script> -->
+    <!-- <script src="TemplateData/script.js"></script> -->
+    <script data-main="TemplateData/scripts/main.js" src="TemplateData/scripts/require.js"></script>
+
+  </head>
+  <body>
+
+    <div class="main">
+       <div class="container-fluid">
+         <div class="row">
+
+           <div class="col-md-3">
+                 <p class="instructions-title submit">Submit</p>
+            <div class="finish">
+                  <button class="finish-btn" id="finish-hit" disabled="true" >
+                    Finish
+                  </button>
+            </div>
+            <div>
+                  <button class="reset-btn" id="reset-hit" disabled="true" >
+                    Reset
+                  </button>
+            </div>
+
+                <div>
+
+            </div>
+            <div>
+            <p id="message-text" hidden="true"></p>
+            </div>
+            <div>
+            <p class="action-text" id="last-action-text" hidden="true"></p>
+            </div>
+
+               <div class="instructions">
+                <p class="instructions-title">Instructions</p>
+                <div class="instruction-section">
+
+                    <div class="instruction-line extra-margin">
+                        <p id="instruction-text"></p>
+                    </div>
+
+                     <div class="instruction-line extra-margin">
+                        <p id="instruction-2"/>
+                    </div>
+
+                     <div class="instruction-line extra-margin">
+                        <p id="instruction-3"/>
+                    </div>
+
+                     <div class="instruction-line">
+                        <p id="instruction-4"/>
+                    </div>
+                     <div class="instruction-line">
+                        <p id="instruction-5"/>
+                    </div>
+
+                      <div class="instruction-line">
+                        <p id="instruction-6"/>
+                    </div>
+                </div>
+            </div>
+
+          </div>
+
+          <div class="webgl-content col-md-6">
+            <div id="gameContainer"></div>
+              <div class="footer">
+                 <div class="webgl-logo"></div>
+                <!-- <div class="fullscreen" onclick="gameInstance.SetFullscreen(1)"></div> -->
+                <div class="title">AI2-Thor</div>
+              </div>
+          </div>
+
+          <div class=col-md-3>
+
+            <div class="row controls-row">
+              <p class="instructions-title">Controls</p>
+            </div>
+
+            <!-- <div class="row controls-row">
+                <div class="col-md-4 controls-col"> <img class="controls-img-medium" src="TemplateData/images/esc.png"/> </div>
+                <div class="col-md-8 controls-col">To enable or disable game controls.</div>
+            </div> -->
+
+            <div class="row controls-row">
+                <img class="controls-img-medium" src="TemplateData/images/esc.png"/>
+                <span>To enable or disable game controls.</span>
+            </div>
+
+            <!-- <div class="row controls-row">
+                <div class="col-md-4 controls-col"> <img class="controls-img-medium" src="TemplateData/images/mouselook.png"/> </div>
+                <div class="col-md-8 controls-col">Use your mouse to look around.</div>
+            </div> -->
+
+            <div class="row controls-row">
+                <img class="controls-img-medium" src="TemplateData/images/mouselook.png"/>
+                <span>Use your mouse to look around.</span>
+            </div>
+
+            <div class="row controls-row">
+                <img class="controls-img-keys" src="TemplateData/images/WASD.png"/>
+                <span style="font-size: 30px">&nbsp;/&nbsp;</span>
+                <img class="controls-img-keys" src="TemplateData/images/arrowkeys.png"/>
+                <span>To move around.</span>
+            </div>
+
+            <div class="row controls-row">
+                <img class="controls-img-medium" src="TemplateData/images/Control.png"/>
+                <span>To crouch or stand.</span>
+            </div>
+
+            <div class="row controls-row">
+                <img class="controls-img-mouse" src="TemplateData/images/leftclick.png"/>
+                <span>To interact with an active object.</span>
+            </div>
+
+            <div class="row controls-row">
+                <img class="controls-img-mouse" src="TemplateData/images/scrollwheel.png"/>
+                <span>To move an object forward or backward.</span>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div id="turk-form">
+      <form id="mturk_form" method="POST" action='https://www.mturk.com/mturk/externalSubmit'>
+          <input type="hidden" id="assignmentId" name="assignmentId"/>
+          <input type="hidden" id="data" name="data"/>
+          <!-- <script language='Javascript'>turkSetAssignmentID();</script> -->
+      </form>
+    </div>
+  </body>
+</html>
