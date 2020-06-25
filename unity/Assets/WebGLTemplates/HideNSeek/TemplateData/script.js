@@ -14,7 +14,8 @@ $(
     let outputData = {
       object_type: getParams['object'],
       object_variation: getParams['variation'],
-      open_objects: []
+      open_objects: [],
+      actions: []
     };
     let gameConfig = null;
     let lastMetadadta = null;
@@ -334,6 +335,14 @@ $(
             UnityProgress(gameInstance, "complete");
             const t1 = performance.now();
             console.log(`Load finished. Took: ${(t1 - t0) / 1000}s`);
+
+            var container = document.getElementById("gameContainer");
+            container.addEventListener('click', function () {
+              if (document.pointerLockElement === null) {
+                this.requestPointerLock();
+                gameInstance.SendMessage('FPSController', 'EnableMouseControl');
+              }
+            })
           },
         }
       });
@@ -372,6 +381,17 @@ $(
                 }
             });
           initGame(window.game_url);
+          if ("onpointerlockchange" in document) {
+            document.addEventListener('pointerlockchange', lockChangeAlert, false);
+          } else if ("onmozpointerlockchange" in document) {
+            document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+          }
+
+          function lockChangeAlert() {
+            if (document.pointerLockElement === null) {
+              gameInstance.SendMessage('FPSController', 'DisableMouseControl');
+            }
+          }
         }
         else {
           // Uses a hider game data to create a game
@@ -409,6 +429,17 @@ $(
 
                   // Starting point for unity
                   initGame(window.game_url);
+                  if ("onpointerlockchange" in document) {
+                    document.addEventListener('pointerlockchange', lockChangeAlert, false);
+                  } else if ("onmozpointerlockchange" in document) {
+                    document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+                  }
+
+                  function lockChangeAlert() {
+                    if (document.pointerLockElement === null) {
+                      gameInstance.SendMessage('FPSController', 'DisableMouseControl');
+                    }
+                  }
            });
         }
       })

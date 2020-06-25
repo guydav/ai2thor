@@ -82,12 +82,15 @@ function($, _, bootstrap, UnityProgress) {
       window.onUnityMetadata = function(metadata) {
         let jsonMeta = JSON.parse(metadata);
         // FIRST init event
+        console.log('Unity Metadata:');
+        console.log(jsonMeta);
         handleEvent(jsonMeta);
         lastMetadadta = jsonMeta;
       };
 
       window.onUnityEvent = function(event) {
         // Logic for handling unity events
+        // console.log(JSON.parse(event));
       };
 
       // Aggregate data
@@ -346,8 +349,29 @@ function($, _, bootstrap, UnityProgress) {
           }
         };
         outputData.actions.push(eventMetadata);
-        console.log(eventMetadata);
+        logEvent(eventMetadata);
       }
+
+      const MAX_LOG_EVENTS = 10;
+
+      function logEvent(meta) {
+        if (meta.lastAction) {
+          while ($('#event-log').children().length >= MAX_LOG_EVENTS) {
+            $('#event-log').children().last().remove();
+          }
+
+          const formatter = new Intl.NumberFormat({maximumSignificantDigits: 3});
+          const message = `<div class="log-message" style="color: ${meta.lastActionSuccess ? "green" : "red"}">
+            Agent took action ${meta.lastAction} which ${meta.lastActionSuccess ? "succeeded" : "failed"}
+            at location (${formatter.format(meta.agent.x)}, ${formatter.format(meta.agent.y)}, ${formatter.format(meta.agent.z)})
+            </div>`;
+          $('#event-log').prepend(message);
+        }
+      }
+
+      $('#event-log-reset').click(function() {
+        $('#event-log').empty();
+      });
 
 
       function initGame(url) {

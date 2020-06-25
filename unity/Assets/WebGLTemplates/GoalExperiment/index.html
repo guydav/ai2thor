@@ -6,7 +6,7 @@
     <title>Unity WebGL Player | AI2-Thor</title>
       <script>
         window.game_build = ".";
-        window.game_url =  "%UNITY_WEBGL_BUILD_URL%";
+        window.game_url =  "Build/goal-experiment-test.json";
         // document.onmousedown = function() {window.focus();};
       </script>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
@@ -29,57 +29,17 @@
     <div class="main">
        <div class="container-fluid">
          <div class="row">
-
            <div class="col-md-3">
-                 <p class="instructions-title submit">Submit</p>
-            <div class="finish">
-                  <button class="finish-btn" id="finish-hit" disabled="true" >
-                    Finish
-                  </button>
-            </div>
-            <div>
-                  <button class="reset-btn" id="reset-hit" disabled="true" >
-                    Reset
-                  </button>
-            </div>
+             <div class="row">
+               <p class="instructions-title">Event Log</p>
+             </div>
 
-                <div>
+             <div class="row">
+               <button id="event-log-reset" class="button btn-secondary">Reset Log</button>
+             </div>
 
-            </div>
-            <div>
-            <p id="message-text" hidden="true"></p>
-            </div>
-            <div>
-            <p class="action-text" id="last-action-text" hidden="true"></p>
-            </div>
+             <div id="event-log" class="row">
 
-               <div class="instructions">
-                <p class="instructions-title">Instructions</p>
-                <div class="instruction-section">
-
-                    <div class="instruction-line extra-margin">
-                        <p id="instruction-text"></p>
-                    </div>
-
-                     <div class="instruction-line extra-margin">
-                        <p id="instruction-2"/>
-                    </div>
-
-                     <div class="instruction-line extra-margin">
-                        <p id="instruction-3"/>
-                    </div>
-
-                     <div class="instruction-line">
-                        <p id="instruction-4"/>
-                    </div>
-                     <div class="instruction-line">
-                        <p id="instruction-5"/>
-                    </div>
-
-                      <div class="instruction-line">
-                        <p id="instruction-6"/>
-                    </div>
-                </div>
             </div>
 
           </div>
