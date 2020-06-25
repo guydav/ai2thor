@@ -1482,7 +1482,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			lastAction = controlCommand.action;
 			lastActionSuccess = false;
 			lastActionObjectId = controlCommand.objectId;
-			lastActionObjectType = controlCommand.objType;
+			lastActionObjectType = controlCommand.objectType;
 			lastActionRceptacleObjectId = controlCommand.receptacleObjectId;
 			lastActionReceptacleObjectType = controlCommand.receptacleObjectType;
 

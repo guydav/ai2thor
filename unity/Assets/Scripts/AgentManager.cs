@@ -71,7 +71,7 @@ public class AgentManager : MonoBehaviour
 
 	}
 
-	void Start() 
+	void Start()
 	{
         //default primary agent's agentController type to "PhysicsRemoteFPSAgentController"
 		initializePrimaryAgent();
@@ -87,11 +87,11 @@ public class AgentManager : MonoBehaviour
         physicsSceneManager = GameObject.Find("PhysicsSceneManager").GetComponent<PhysicsSceneManager>();
 	}
 
-	private void initializePrimaryAgent() 
+	private void initializePrimaryAgent()
     {
         SetUpPhysicsController();
 	}
-	
+
 	public void Initialize(ServerAction action)
 	{
         //first parse agentMode and agentControllerType
@@ -151,7 +151,7 @@ public class AgentManager : MonoBehaviour
             SetUpDroneController(action);
 
         }
-        
+
 		primaryAgent.ProcessControlCommand (action);
 		primaryAgent.IsVisible = action.makeAgentsVisible;
 		this.renderClassImage = action.renderClassImage;
@@ -239,7 +239,7 @@ public class AgentManager : MonoBehaviour
 
 		camera.cullingMask = ~(1 << 11);
 
-		if (this.renderDepthImage || this.renderClassImage || this.renderObjectImage || this.renderNormalsImage || this.renderFlowImage) 
+		if (this.renderDepthImage || this.renderClassImage || this.renderObjectImage || this.renderNormalsImage || this.renderFlowImage)
 		{
 			gameObject.AddComponent(typeof(ImageSynthesis));
 		}
@@ -326,7 +326,7 @@ public class AgentManager : MonoBehaviour
 					maxHit = hit;
 					maxDirection = d;
 				}
-				
+
 			}
 		}
 
@@ -414,7 +414,7 @@ public class AgentManager : MonoBehaviour
             }
         }
 
-		if (completeCount == agents.Count && completeCount > 0 && readyToEmit) 
+		if (completeCount == agents.Count && completeCount > 0 && readyToEmit)
         {
             //start emit frame for physics and stochastic controllers
 			if(!droneMode)
@@ -422,7 +422,7 @@ public class AgentManager : MonoBehaviour
 				readyToEmit = false;
 				StartCoroutine (EmitFrame ());
 			}
-            
+
             //start emit frame for flying drone controller
             if(droneMode)
             {
@@ -449,7 +449,7 @@ public class AgentManager : MonoBehaviour
 	}
 
 	private byte[] captureScreen() {
-		if (tex.height != UnityEngine.Screen.height || 
+		if (tex.height != UnityEngine.Screen.height ||
 			tex.width != UnityEngine.Screen.width) {
 			tex = new Texture2D(UnityEngine.Screen.width, UnityEngine.Screen.height, TextureFormat.RGB24, false);
 			readPixelsRect = new Rect(0, 0, UnityEngine.Screen.width, UnityEngine.Screen.height);
@@ -602,7 +602,7 @@ public class AgentManager : MonoBehaviour
         multiMeta.agents = new MetadataWrapper[this.agents.Count];
         multiMeta.activeAgentId = this.activeAgentId;
         multiMeta.sequenceId = this.currentSequenceId;
-		
+
 
 		ThirdPartyCameraMetadata[] cameraMetadata = new ThirdPartyCameraMetadata[this.thirdPartyCameras.Count];
 		RenderTexture currentTexture = null;
@@ -675,7 +675,7 @@ public class AgentManager : MonoBehaviour
         form.AddField("actionReturns", serializedActionReturns);
         form.AddField("token", robosimsClientToken);
 
-        #if !UNITY_WEBGL 
+        #if !UNITY_WEBGL
 		if (synchronousHttp) {
 
 			if (this.sock == null) {
@@ -718,7 +718,7 @@ public class AgentManager : MonoBehaviour
 
                 // read header
                 while (true) {
-                    int received = this.sock.Receive(headerBuffer, bytesReceived, headerBuffer.Length - bytesReceived, SocketFlags.None);	
+                    int received = this.sock.Receive(headerBuffer, bytesReceived, headerBuffer.Length - bytesReceived, SocketFlags.None);
                     if (received == 0) {
                         Debug.LogError("0 bytes received attempting to read header - connection closed");
                         break;
@@ -739,7 +739,7 @@ public class AgentManager : MonoBehaviour
                 // read body
                 while (bodyBytesReceived < contentLength) {
                     // check for 0 bytes received
-                    int received = this.sock.Receive(bodyBuffer, bodyBytesReceived, bodyBuffer.Length - bodyBytesReceived, SocketFlags.None);	
+                    int received = this.sock.Receive(bodyBuffer, bodyBytesReceived, bodyBuffer.Length - bodyBytesReceived, SocketFlags.None);
                     if (received == 0) {
                         Debug.LogError("0 bytes received attempting to read body - connection closed");
                         break;
@@ -821,7 +821,7 @@ public class AgentManager : MonoBehaviour
 		} else if (controlCommand.action == "UpdateThirdPartyCamera") {
 			this.UpdateThirdPartyCamera(controlCommand);
 		} else {
-            // we only allow renderObjectImage to be flipped on 
+            // we only allow renderObjectImage to be flipped on
             // on a per step() basis, since by default the param is false
             // so we don't know if a request is meant to turn the param off
             // or if it is just the value by default
@@ -931,7 +931,7 @@ public class ObjectMetadata
 	///
 	//note: some objects are not themselves toggleable, because they must be toggled on/off via another sim object (stove knob -> stove burner)
 	public bool toggleable;//is this object able to be toggled on/off directly?
-	
+
 	//note some objects can still return the istoggle value even if they cannot directly be toggled on off (stove burner -> stove knob)
 	public bool isToggled;//is this object currently on or off? true is on
 	///
@@ -945,7 +945,7 @@ public class ObjectMetadata
 	public bool isDirty;//is this object in a dirty or clean state?
 	///
 	public bool canBeUsedUp;//for objects that can be emptied or depleted (toilet paper, paper towels, tissue box etc) - specifically not for liquids
-	public bool isUsedUp; 
+	public bool isUsedUp;
 	///
 	public bool cookable;//can this object be turned to a cooked state? object should not be able to toggle back to uncooked state with contextual interactions, only a direct action
 	public bool isCooked;//is it cooked right now? - context sensitive objects might set this automatically like Toaster/Microwave/ Pots/Pans if isHeated = true
@@ -987,7 +987,7 @@ public class ObjectMetadata
     public bool isMoving;//true if this game object currently has a non-zero velocity
     public AxisAlignedBoundingBox axisAlignedBoundingBox;
     public ObjectOrientedBoundingBox objectOrientedBoundingBox;
-    
+
 	public ObjectMetadata() { }
 }
 
@@ -1110,6 +1110,10 @@ public struct MetadataWrapper
 	public InventoryObject[] inventoryObjects;
 	public string sceneName;
 	public string lastAction;
+	public string lastActionObjectType;
+	public string lastActionObjectId;
+	public string lastActionReceptacleObjectType;
+	public string lastActionRceptacleObjectId;
 	public string errorMessage;
 	public string errorCode; // comes from ServerActionErrorCode
 	public bool lastActionSuccess;
@@ -1185,7 +1189,7 @@ public class ServerAction
 	public string sceneName;
 	public bool rotateOnTeleport;
 	public bool forceVisible;
-    public bool anywhere;//used for SpawnTargetCircle, GetSpawnCoordinatesAboveObject for if anywhere or only in agent view 
+    public bool anywhere;//used for SpawnTargetCircle, GetSpawnCoordinatesAboveObject for if anywhere or only in agent view
 	public bool randomizeOpen;
 	public int randomSeed;
 	public float moveMagnitude;
@@ -1216,7 +1220,7 @@ public class ServerAction
     public float angularDrag;
     public ObjectTypeCount[] numDuplicatesOfType; //specify, by object Type, how many duplicates of that given object type to try and spawn
     //use only the objectType class member to specify which receptacle objects should be excluded from the valid receptacles to spawn objects in
-    public String[] excludedReceptacles; 
+    public String[] excludedReceptacles;
     public ObjectPose[] objectPoses;
     public SetObjectStates SetObjectStates;
     public float minDistance;//used in target circle spawning function
