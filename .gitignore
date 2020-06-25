@@ -104,3 +104,4 @@ unity/Assets/Scripts/CreateNewPrefab.cs
 unity/Assets/Editor/Instant Screenshot.meta
 unity/Assets/Editor/Instant Screenshot/Documentation - Instant screenshot.pdf
 unity/Assets/Editor/Instant Screenshot/Documentation - Instant screenshot.pdf.meta
+*.meta
