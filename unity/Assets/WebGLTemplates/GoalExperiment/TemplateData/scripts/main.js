@@ -339,6 +339,7 @@ function($, _, bootstrap, UnityProgress) {
         let eventMetadata = {
           lastAction: agentMetadata.lastAction,
           lastActionSuccess: agentMetadata.lastActionSuccess,
+          lastActionObjectId: agentMetadata.lastActionObjectId,
           agent: {
             x: agent.position.x,
             y: agent.position.y,
@@ -362,8 +363,10 @@ function($, _, bootstrap, UnityProgress) {
 
           const formatter = new Intl.NumberFormat({maximumSignificantDigits: 3});
           const message = `<div class="log-message" style="color: ${meta.lastActionSuccess ? "green" : "red"}">
-            Agent took action ${meta.lastAction} which ${meta.lastActionSuccess ? "succeeded" : "failed"}
+            Agent took action ${meta.lastAction}
+            on ${meta.lastActionObjectId.split("|", 1)[0]}
             at location (${formatter.format(meta.agent.x)}, ${formatter.format(meta.agent.y)}, ${formatter.format(meta.agent.z)})
+            which ${meta.lastActionSuccess ? "succeeded" : "failed"}
             </div>`;
           $('#event-log').prepend(message);
         }
