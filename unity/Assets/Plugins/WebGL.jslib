@@ -6,7 +6,7 @@ mergeInto(LibraryManager.library, {
         window.onGameLoaded();
     }
   },
-  
+
   SendEvent: function(str) {
     if (window.onUnityEvent && typeof window.onUnityEvent === "function") {
         window.onUnityEvent(Pointer_stringify(str));
@@ -18,5 +18,11 @@ mergeInto(LibraryManager.library, {
         window.onUnityMetadata(Pointer_stringify(str));
     }
   },
+
+   SendMovement: function(str) {
+   if (window.onUnityMovement && typeof window.onUnityMovement === "function") {
+       window.onUnityMovement(Pointer_stringify(str));
+   }
+ },
 
 });

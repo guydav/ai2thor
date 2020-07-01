@@ -8,6 +8,7 @@
   ],
   "dependencies": {
     "jillejr.newtonsoft.json-for-unity": "12.0.301",
+    "com.unity.mathematics": "1.1.0",
     "com.unity.ads": "2.0.8",
     "com.unity.analytics": "3.2.2",
     "com.unity.collab-proxy": "1.2.15",

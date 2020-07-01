@@ -698,6 +698,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         //XXX revisit what movement means when we more clearly define what "continuous" movement is
         protected bool moveInDirection(Vector3 direction, string objectId="", float maxDistanceToObject=-1.0f, bool forceAction = false) {
+						Console.WriteLine("moveInDirection reached for objectId " + objectId);
+
             Vector3 targetPosition = transform.position + direction;
             float angle = Vector3.Angle(transform.forward, Vector3.Normalize(direction));
 
@@ -706,6 +708,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 angle = 360f - angle;
             }
             int angleInt = Mathf.RoundToInt(angle) % 360;
+						bool status;
 
             if (checkIfSceneBoundsContainTargetPosition(targetPosition) &&
                 CheckIfItemBlocksAgentMovement(direction.magnitude, angleInt, forceAction) && // forceAction = true allows ignoring movement restrictions caused by held objects
@@ -728,10 +731,28 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         return false;
                     }
                 }
-                return true;
+                status = true;
             } else {
-                return false;
+                status = false;
             }
+
+						#if UNITY_WEBGL
+						JavaScriptInterface jsInterface = this.GetComponent<JavaScriptInterface>();
+            if (jsInterface != null) {
+							MovementWrapper movement = new MovementWrapper();
+							movement.position = transform.position;
+							movement.rotationEulerAngles = transform.rotation.eulerAngles;
+							movement.direction = direction;
+							movement.targetPosition = targetPosition;
+							movement.angle = angle;
+							movement.angleInt = angleInt;
+							movement.succeeded = status;
+
+							jsInterface.SendMovementData(movement);
+						}
+		        #endif
+
+						return status;
         }
 
         protected float distanceToObject(SimObjPhysics sop) {
@@ -1586,6 +1607,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 		{
             // TODO: Simplify this???
 			//resetHand(); when I looked at this resetHand in DiscreteRemoteFPSAgent was just commented out doing nothing so...
+			Console.WriteLine("moveCharacter reached for objectId " + action.objectId);
+
 			moveMagnitude = gridSize;
 			if (action.moveMagnitude > 0)
 			{
@@ -1646,13 +1669,14 @@ namespace UnityStandardAssets.Characters.FirstPerson
 		}
 
         //overriden by stochastic
-        public virtual void MoveRelative(ServerAction action) {
-            var moveLocal = new Vector3(action.x, 0, action.z);
-            Vector3 moveWorldSpace = transform.rotation * moveLocal;
-            moveWorldSpace.y = Physics.gravity.y * this.m_GravityMultiplier;
-			m_CharacterController.Move(moveWorldSpace);
-			actionFinished(true);
-        }
+    public virtual void MoveRelative(ServerAction action) {
+					Console.WriteLine("MoveRelative reached for objectId " + action.objectId);
+		      var moveLocal = new Vector3(action.x, 0, action.z);
+		      Vector3 moveWorldSpace = transform.rotation * moveLocal;
+		      moveWorldSpace.y = Physics.gravity.y * this.m_GravityMultiplier;
+					m_CharacterController.Move(moveWorldSpace);
+					actionFinished(true);
+    }
 
 		//free rotate, change forward facing of Agent
         //this is currently overrided by Rotate in Stochastic Controller

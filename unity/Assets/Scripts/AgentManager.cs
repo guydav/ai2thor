@@ -200,11 +200,11 @@ public class AgentManager : MonoBehaviour
     private void SetUpPhysicsController ()
     {
         this.agents.Clear();
-		GameObject fpsController = GameObject.FindObjectOfType<BaseFPSAgentController>().gameObject;
-		primaryAgent = fpsController.GetComponent<PhysicsRemoteFPSAgentController>();
-		primaryAgent.enabled = true;
-		primaryAgent.agentManager = this;
-		primaryAgent.actionComplete = true;
+				GameObject fpsController = GameObject.FindObjectOfType<BaseFPSAgentController>().gameObject;
+				primaryAgent = fpsController.GetComponent<PhysicsRemoteFPSAgentController>();
+				primaryAgent.enabled = true;
+				primaryAgent.agentManager = this;
+				primaryAgent.actionComplete = true;
         this.agents.Add(primaryAgent);
     }
 
@@ -629,20 +629,20 @@ public class AgentManager : MonoBehaviour
         }
 
         for (int i = 0; i < this.agents.Count; i++) {
-            BaseFPSAgentController agent = this.agents.ToArray () [i];
+            BaseFPSAgentController agent = this.agents.ToArray()[i];
             #if UNITY_WEBGL
             jsInterface = agent.GetComponent<JavaScriptInterface>();
             #endif
-            MetadataWrapper metadata = agent.generateMetadataWrapper ();
+            MetadataWrapper metadata = agent.generateMetadataWrapper();
             metadata.agentId = i;
             actionReturns[i] = agent.actionReturn;
 
             // we don't need to render the agent's camera for the first agent
             if (shouldRender) {
-                addImageForm (form, agent);
+                addImageForm(form, agent);
                 addImageSynthesisImageForm(form, agent.imageSynthesis, this.renderDepthImage, "_depth", "image_depth");
                 addImageSynthesisImageForm(form, agent.imageSynthesis, this.renderNormalsImage, "_normals", "image_normals");
-                addObjectImageForm (form, agent, ref metadata);
+                addObjectImageForm(form, agent, ref metadata);
                 addImageSynthesisImageForm(form, agent.imageSynthesis, this.renderClassImage, "_class", "image_classes");
                 addImageSynthesisImageForm(form, agent.imageSynthesis, this.renderFlowImage, "_flow", "image_flow");
 
@@ -665,8 +665,9 @@ public class AgentManager : MonoBehaviour
 
         var serializedMetadata = JsonUtility.ToJson(multiMeta);
 
-		#if UNITY_WEBGL
-                if (jsInterface != null) {
+				#if UNITY_WEBGL
+        if (jsInterface != null) {
+					Console.WriteLine("About to send out metadata");
 					jsInterface.SendActionMetadata(serializedMetadata);
 				}
         #endif
@@ -1141,6 +1142,22 @@ public struct MetadataWrapper
 	public List<Vector3> visibleRange;
 	public float currentTime;
     public SceneBounds sceneBounds;//return coordinates of the scene's bounds (center, size, extents)
+}
+
+[Serializable]
+public struct MovementWrapper
+{
+	public Vector3 position;
+	public Vector3 rotationEulerAngles;
+	public Vector3 direction;
+	public Vector2 input;
+	public Vector3 targetPosition;
+	public float angle;
+	public int angleInt;
+	public bool succeeded;
+	public bool touchingSide;
+	public bool touchingCeiling;
+	public bool touchingFloor;
 }
 
 [Serializable]

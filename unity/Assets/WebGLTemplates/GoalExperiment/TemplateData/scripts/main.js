@@ -93,6 +93,13 @@ function($, _, bootstrap, UnityProgress) {
         // console.log(JSON.parse(event));
       };
 
+      window.onUnityMovement = function(movement) {
+        let jsonMovement = JSON.parse(movement);
+        // FIRST init event
+        console.log('Unity Movement:');
+        console.log(jsonMovement);
+      };
+
       // Aggregate data
       function gatherFinalState(metadata) {
         let agentMetadata = metadata.agents[0];
@@ -336,10 +343,17 @@ function($, _, bootstrap, UnityProgress) {
         }
         let agentMetadata = metadata.agents[0];
         let agent = agentMetadata.agent;
+        let potentialObjects = agentMetadata.objects.filter((obj) => { return obj.objectId == agentMetadata.lastActionObjectId });
+        let matchingObject = null;
+        if (potentialObjects.length == 1) {
+          matchingObject = potentialObjects[0];
+        }
+
         let eventMetadata = {
           lastAction: agentMetadata.lastAction,
           lastActionSuccess: agentMetadata.lastActionSuccess,
           lastActionObjectId: agentMetadata.lastActionObjectId,
+          lastActionObject: matchingObject,
           agent: {
             x: agent.position.x,
             y: agent.position.y,
