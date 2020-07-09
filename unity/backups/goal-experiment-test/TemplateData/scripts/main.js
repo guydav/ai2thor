@@ -50,6 +50,145 @@ function($, _, bootstrap, UnityProgress) {
       let pickupFailTimeout = false;
       let hasObject = false;
 
+      class Instruction {
+        constructor(text, evaluator, id) {
+          this.text = text;
+          this.evaluator = evaluator;
+          this.id = id;
+        }
+
+        evaluate(metadata) {
+          if (this.evaluator) {
+            return this.evaluator(metadata);
+          }
+
+          return false;
+        }
+
+        l2(a, b) {
+           return a
+               .map((x, i) => Math.abs( x - b[i] ) ** 2) // square the difference
+               .reduce((sum, now) => sum + now) // sum
+               ** (1/2);
+        }
+      }
+
+      class ObjectActionInstruction extends Instruction {
+        constructor(text, objectName, actionName, id) {
+          super(text, null, id);
+          this.actionName = actionName;
+          this.objectName = objectName;
+        }
+
+        evaluate(metadata) {
+          return (this.actionName === metadata.lastAction) && (metadata.lastActionObject.name.startsWith(this.objectName));
+        }
+      }
+
+      class ObjectActionPositionInstruction extends ObjectActionInstruction {
+        constructor(text, objectName, actionName, position, id, tolerance = 0.01) {
+          super(text, objectName, actionName, id);
+          this.position = position;
+          this.tolerance = tolerance;
+        }
+
+        evaluate(metadata) {
+          let pos = metadata.lastActionObject.position;
+          let posArr = [pos.x, pos.y, pos.z];
+          return super.evaluate(metadata) && super.l2(posArr, this.position) < this.tolerance;
+        }
+      }
+
+      class ObjectStatusInstruction extends Instruction {
+        constructor(text, objectName, statusName, id, statusValue = true) {
+          super(text, null, id);
+          this.objectName = objectName;
+          this.statusName = statusName;
+          this.statusValue = statusValue;
+        }
+
+        evaluate(metadata) {
+          const filtered = metadata.allObjects.filter((obj) => obj.name.startsWith(this.objectName));
+          for (const targetObject of filtered) {
+            if (targetObject[this.statusName] == this.statusValue) {
+              return true;
+            }
+          }
+          return false;
+        }
+      }
+
+      class ObjectPositionInstruction extends Instruction {
+        constructor(text, objectName, position, id, tolerance = 0.25) {
+          super(text, null, id);
+          this.objectName = objectName;
+          this.position = position;
+          this.tolerance = tolerance;
+        }
+
+        evaluate(metadata) {
+          const filtered = metadata.allObjects.filter((obj) => obj.name.startsWith(this.objectName));
+          for (const targetObject of filtered) {
+            let pos = targetObject.position;
+            let posArr = [pos.x, pos.y, pos.z];
+            if (super.l2(posArr, this.position) < this.tolerance) {
+              return true;
+            }
+          }
+          return false;
+        }
+      }
+
+      // Instruction steps
+      // 1 Open the fridge
+      // 2 Pick up the apple from the table
+      // 3 Put it in the fridge
+      // 4 Close the fridge
+      // 5 Pick up the pot
+      // 6 Fill it with water
+      // 7 Put it on the stove
+
+      const instructions = [
+        new ObjectActionInstruction('Open the fridge', 'Fridge', 'OpenObject'),
+        new ObjectActionInstruction('Pick up the apple from the table', 'Apple', 'PickupObject'),
+        new ObjectPositionInstruction('Put the apple in the fridge', 'Apple', [-2.145, 0.845, 1.13]),
+        new ObjectActionInstruction('Close the fridge', 'Fridge', 'CloseObject'),
+        new ObjectActionInstruction('Pick up the pot', 'Pot', 'PickupObject'),
+        new ObjectStatusInstruction('Fill the pot with water', 'Pot', 'isFilledWithLiquid')
+      ];
+
+      // TODO render out instructions
+      instructions.forEach((instruction, index) => {
+        if (!instruction.id) {
+          instruction.id = `instruction-${index}`;
+        }
+        const message = `<div class="log-message" id="${instruction.id}">
+          ${instruction.text}
+          </div>`;
+        $('#instructions').append(message);
+
+      });
+
+      let currentInstructionIndex = 0;
+      $(`#${instructions[currentInstructionIndex].id}`).css('font-weight', 'bold');
+
+      // TODO handler to recognize if the current insturction was performed, and if it was, make the necessary UI changes
+
+      function instructionsEventHandler(metadata) {
+        if (currentInstructionIndex >= instructions.length) {
+          return;
+        }
+
+        let currentInstruction = instructions[currentInstructionIndex];
+        if (currentInstruction.evaluate(metadata)) {
+          $(`#${currentInstruction.id}`).css('font-weight', 'normal').css('color', 'grey').css('text-decoration', 'line-through');
+          currentInstructionIndex += 1;
+          if (currentInstructionIndex < instructions.length) {
+            $(`#${instructions[currentInstructionIndex].id}`).css('font-weight', 'bold');
+          }
+        }
+      }
+
       // Utils
       function paramStrToAssocArray(prmstr) {
         let params = {};
@@ -83,7 +222,7 @@ function($, _, bootstrap, UnityProgress) {
         let jsonMeta = JSON.parse(metadata);
         // FIRST init event
         console.log('Unity Metadata:');
-        console.log(jsonMeta);
+        // console.log(jsonMeta);
         handleEvent(jsonMeta);
         lastMetadadta = jsonMeta;
       };
@@ -91,6 +230,13 @@ function($, _, bootstrap, UnityProgress) {
       window.onUnityEvent = function(event) {
         // Logic for handling unity events
         // console.log(JSON.parse(event));
+      };
+
+      window.onUnityMovement = function(movement) {
+        let jsonMovement = JSON.parse(movement);
+        // FIRST init event
+        console.log('Unity Movement:');
+        console.log(jsonMovement);
       };
 
       // Aggregate data
@@ -336,10 +482,17 @@ function($, _, bootstrap, UnityProgress) {
         }
         let agentMetadata = metadata.agents[0];
         let agent = agentMetadata.agent;
+        let potentialObjects = agentMetadata.objects.filter((obj) => { return obj.objectId == agentMetadata.lastActionObjectId });
+        let matchingObject = null;
+        if (potentialObjects.length == 1) {
+          matchingObject = potentialObjects[0];
+        }
+
         let eventMetadata = {
           lastAction: agentMetadata.lastAction,
           lastActionSuccess: agentMetadata.lastActionSuccess,
           lastActionObjectId: agentMetadata.lastActionObjectId,
+          lastActionObject: matchingObject,
           agent: {
             x: agent.position.x,
             y: agent.position.y,
@@ -347,15 +500,19 @@ function($, _, bootstrap, UnityProgress) {
             rotation: agent.rotation.y,
             horizon: agent.cameraHorizon,
             standing: agentMetadata.isStanding
-          }
+          },
+          allObjects: agentMetadata.objects
         };
         outputData.actions.push(eventMetadata);
         logEvent(eventMetadata);
+        instructionsEventHandler(eventMetadata);
       }
 
       const MAX_LOG_EVENTS = 10;
 
       function logEvent(meta) {
+        console.log(meta);
+
         if (meta.lastAction) {
           while ($('#event-log').children().length >= MAX_LOG_EVENTS) {
             $('#event-log').children().last().remove();
@@ -412,13 +569,13 @@ function($, _, bootstrap, UnityProgress) {
           // Instruction Rendering
           if (hider) {
               let objectHtml = `<strong class="important-text">${getParams['object']}</strong>`;
-              $("#instruction-text").html(`You have to hide a ${objectHtml}`);
-              $("#instruction-2").html(`Move around in the room, open drawers and cabinets to look for a good hiding spot.`);
-              $("#instruction-3").html('When you are ready, move the object (see Shift controls) to place it more precisely, click on it to drop it.');
-              $("#instruction-4").html(`If you're happy with your hiding spot click the <strong class="green-text">Finish</strong> button above. Or <strong class="red-text">Reset</strong> to start over.`);
-               $("#instruction-5").html("If a door/drawer opens and closes, it means you're in the way! Move back and try again.");
-               $("#instruction-6").html("If you're clicking on the object and it's not being picked up, try moving closer to the object! (within 1.5 meters)");
-              $("#instructions-hider").show();
+              // $("#instruction-text").html(`You have to hide a ${objectHtml}`);
+              // $("#instruction-2").html(`Move around in the room, open drawers and cabinets to look for a good hiding spot.`);
+              // $("#instruction-3").html('When you are ready, move the object (see Shift controls) to place it more precisely, click on it to drop it.');
+              // $("#instruction-4").html(`If you're happy with your hiding spot click the <strong class="green-text">Finish</strong> button above. Or <strong class="red-text">Reset</strong> to start over.`);
+              //  $("#instruction-5").html("If a door/drawer opens and closes, it means you're in the way! Move back and try again.");
+              //  $("#instruction-6").html("If you're clicking on the object and it's not being picked up, try moving closer to the object! (within 1.5 meters)");
+              // $("#instructions-hider").show();
 
               $(document).keypress(function(event) {
                   if (event.keyCode === 32) {
