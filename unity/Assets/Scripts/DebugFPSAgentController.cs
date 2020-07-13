@@ -248,7 +248,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
         {
             if (Event.current.type == EventType.ScrollWheel && scroll2DEnabled)
             {
-                if (this.PhysicsController.WhatAmIHolding() != null)
+                GameObject heldObject = this.PhysicsController.WhatAmIHolding();
+                if (heldObject != null)
                 {
                     var scrollAmount = Event.current.delta;
                     var eps = 1e-6;
@@ -257,9 +258,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         ServerAction action = new ServerAction
                         {
                             action = "MoveHandDelta",
+                            objectName = heldObject.name,
                             x = scrollAmount.x * 0.05f,
                             z = scrollAmount.y * -0.05f,
-                            y = 0
+                            y = 0,
                         };
                         this.PhysicsController.ProcessControlCommand(action);
                     }

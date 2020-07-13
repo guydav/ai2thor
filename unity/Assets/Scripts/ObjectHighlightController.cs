@@ -137,7 +137,9 @@ namespace UnityStandardAssets.Characters.FirstPerson {
                             ServerAction action = new ServerAction
                             {
                                 action = actionName,
-                                objectId = closestObj.objectID
+                                objectId = closestObj.objectID,
+                                objectType = closestObj.ObjType.ToString("g"),
+                                objectName = closestObj.gameObject.name
                             };
                             this.PhysicsController.ProcessControlCommand(action);
                         }
@@ -164,7 +166,10 @@ namespace UnityStandardAssets.Characters.FirstPerson {
                             ServerAction action = new ServerAction
                             {
                                 action = actionName,
-                                objectId = closestObj.objectID
+                                objectId = closestObj.objectID,
+                                objectType = closestObj.ObjType.ToString("g"),
+                                objectName = closestObj.gameObject.name
+
                             };
                             this.PhysicsController.ProcessControlCommand(action);
                         }
@@ -257,6 +262,25 @@ namespace UnityStandardAssets.Characters.FirstPerson {
                                     forceAction = true
                                 };
                             }
+                            GameObject heldObject = this.PhysicsController.WhatAmIHolding();
+                            if (heldObject != null)
+                            {
+                                action.objectName = heldObject.name;
+                            }
+                            //Console.WriteLine(String.Format("In the throw object branch, action is {0}, objectName is {1}",
+                            //                                action.action, action.objectName));
+
+                            //if (highlightedObject != null)
+                            //{
+                            //    Console.WriteLine(String.Format("Highlighted object is {0}, its objectID is {1}, and the condition is {2}",
+                            //        highlightedObject, highlightedObject.objectID,
+                            //        (highlightedObject != null && this.PhysicsController.WhatAmIHolding() == highlightedObject.gameObject)));
+                            //}
+                            //else
+                            //{
+
+                            //    Console.WriteLine(string.Format("Highlighted object is null, WhatAmIHolding is {0}, whose name is {1}", gameObject, gameObject.name));
+                            //}
                             this.PhysicsController.ProcessControlCommand(action);
                             this.mouseDownThrow = false;
                         }

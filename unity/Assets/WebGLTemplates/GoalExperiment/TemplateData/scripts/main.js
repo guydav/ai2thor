@@ -81,7 +81,7 @@ function($, _, bootstrap, UnityProgress) {
         }
 
         evaluate(metadata) {
-          return (this.actionName === metadata.lastAction) && (metadata.lastActionObject.name.startsWith(this.objectName));
+          return (this.actionName === metadata.lastAction) && (metadata.lastActionObjectName.startsWith(this.objectName));
         }
       }
 
@@ -492,6 +492,7 @@ function($, _, bootstrap, UnityProgress) {
           lastAction: agentMetadata.lastAction,
           lastActionSuccess: agentMetadata.lastActionSuccess,
           lastActionObjectId: agentMetadata.lastActionObjectId,
+          lastActionObjectName: agentMetadata.lastActionObjectName,
           lastActionObject: matchingObject,
           agent: {
             x: agent.position.x,

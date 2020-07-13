@@ -648,7 +648,7 @@ public class AgentManager : MonoBehaviour
 
                 metadata.thirdPartyCameras = cameraMetadata;
             }
-            multiMeta.agents [i] = metadata;
+            multiMeta.agents[i] = metadata;
         }
 
         if (shouldRender) {
@@ -665,11 +665,12 @@ public class AgentManager : MonoBehaviour
 
         var serializedMetadata = JsonUtility.ToJson(multiMeta);
 
-				#if UNITY_WEBGL
+		#if UNITY_WEBGL
         if (jsInterface != null) {
-					Console.WriteLine("About to send out metadata");
-					jsInterface.SendActionMetadata(serializedMetadata);
-				}
+			//Console.WriteLine("About to send out metadata");
+			//Console.WriteLine(String.Format("{0}: {1}", multiMeta.agents[0].lastAction, multiMeta.agents[0].lastActionObjectName));
+			jsInterface.SendActionMetadata(serializedMetadata);
+		}
         #endif
 
         form.AddField("metadata", serializedMetadata);
@@ -1113,6 +1114,7 @@ public struct MetadataWrapper
 	public string lastAction;
 	public string lastActionObjectType;
 	public string lastActionObjectId;
+	public string lastActionObjectName;
 	public string lastActionReceptacleObjectType;
 	public string lastActionRceptacleObjectId;
 	public string errorMessage;

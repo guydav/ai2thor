@@ -115,6 +115,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 		protected bool lastActionSuccess;
 		protected string lastActionObjectType;
 		protected string lastActionObjectId;
+        protected string lastActionObjectName;
 		protected string lastActionReceptacleObjectType;
 		protected string lastActionRceptacleObjectId;
 		protected string errorMessage;
@@ -1414,11 +1415,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
             metaMessage.fov = m_Camera.fieldOfView;
             metaMessage.lastAction = lastAction;
             metaMessage.lastActionSuccess = lastActionSuccess;
-						metaMessage.lastActionObjectId = lastActionObjectId;
-						metaMessage.lastActionObjectType = lastActionObjectType;
-						metaMessage.lastActionRceptacleObjectId = lastActionRceptacleObjectId;
-						metaMessage.lastActionReceptacleObjectType = lastActionReceptacleObjectType;
+			metaMessage.lastActionObjectId = lastActionObjectId;
+            metaMessage.lastActionObjectName = lastActionObjectName;
+            metaMessage.lastActionObjectType = lastActionObjectType;
+			metaMessage.lastActionRceptacleObjectId = lastActionRceptacleObjectId;
+			metaMessage.lastActionReceptacleObjectType = lastActionReceptacleObjectType;
             metaMessage.errorMessage = errorMessage;
+
+            //Console.WriteLine(String.Format("In BaseFPSAgentController.generateMetadataWrapper(), metaMessage.lastAction is {0}, metaMessage.lastActionObjectName is {1}",
+            //                                                metaMessage.lastAction, metaMessage.lastActionObjectName));
 
             if (errorCode != ServerActionErrorCode.Undefined) {
                 metaMessage.errorCode = Enum.GetName(typeof(ServerActionErrorCode), errorCode);
@@ -1503,11 +1508,15 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			lastAction = controlCommand.action;
 			lastActionSuccess = false;
 			lastActionObjectId = controlCommand.objectId;
+            lastActionObjectName = controlCommand.objectName;
 			lastActionObjectType = controlCommand.objectType;
 			lastActionRceptacleObjectId = controlCommand.receptacleObjectId;
 			lastActionReceptacleObjectType = controlCommand.receptacleObjectType;
 
-			lastPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+            //Console.WriteLine(String.Format("In BaseFPSAgentController.ProcessControlCommand(), lastAction is {0}, lastActionObjectName is {1}",
+            //                                                lastAction, lastActionObjectName));
+
+            lastPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
 			System.Reflection.MethodInfo method = this.GetType().GetMethod(controlCommand.action);
 
 			this.actionComplete = false;
