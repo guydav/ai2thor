@@ -166,7 +166,6 @@ function($, _, bootstrap, UnityProgress) {
           ${instruction.text}
           </div>`;
         $('#instructions').append(message);
-
       });
 
       let currentInstructionIndex = 0;
@@ -185,9 +184,23 @@ function($, _, bootstrap, UnityProgress) {
           currentInstructionIndex += 1;
           if (currentInstructionIndex < instructions.length) {
             $(`#${instructions[currentInstructionIndex].id}`).css('font-weight', 'bold');
+          } else {
+            $('#end-tutorial-button').css('display', 'block');
           }
         }
       }
+
+      $('#end-tutorial-button').click(function() {
+        gameInstance.SendMessage('PhysicsSceneManager', 'SwitchScene', 'FloorPlan7_physics');
+        $('#end-tutorial-button').css('display', 'none');
+        $('#instructions').empty();
+        const message = `<div class="log-message" id="post-tutorial-instruction">
+          Please explore the new environment.<br>
+          Instructions will appear shortly...
+          </div>`;
+        $('#instructions').append(message);
+
+      });
 
       // Utils
       function paramStrToAssocArray(prmstr) {

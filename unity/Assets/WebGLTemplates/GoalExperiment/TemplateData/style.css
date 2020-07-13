@@ -50,6 +50,10 @@ canvas {
   padding-right: 8px;
 }
 
+.log-button {
+  padding: 8px;
+}
+
 /*
 .submit-container {
     display: flex;
