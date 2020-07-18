@@ -180,8 +180,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             // character controller parameters
             m_CharacterController = GetComponent<CharacterController>();
-			this.m_WalkSpeed = 2;
-			this.m_RunSpeed = 10;
+			this.m_WalkSpeed = 10;
+			this.m_RunSpeed = 20;
 			this.m_GravityMultiplier = 2;
 
 		}

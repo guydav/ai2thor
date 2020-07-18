@@ -195,12 +195,19 @@ function($, _, bootstrap, UnityProgress) {
         $('#end-tutorial-button').css('display', 'none');
         $('#instructions').empty();
         const message = `<div class="log-message" id="post-tutorial-instruction">
-          Please explore the new environment.<br>
-          Instructions will appear shortly...
+          Now, please explore the new room.<br>
+          When you're ready, please create a game that can be scored (either as success or failure, or by points).<br>
+          When you're done, click the button below:
           </div>`;
         $('#instructions').append(message);
-
+        $('#game-ready-button').css('display', 'block');
       });
+
+      $('#game-ready-button').click(function() {
+        $('#game-ready-button').css('display', 'none');
+        $('#game-form').css('display', 'block');
+      });
+
 
       // Utils
       function paramStrToAssocArray(prmstr) {
@@ -534,9 +541,17 @@ function($, _, bootstrap, UnityProgress) {
           }
 
           const formatter = new Intl.NumberFormat({maximumSignificantDigits: 3});
+          let objectName = meta.lastActionObjectId.split("|", 1)[0];
+          let objectId = '';
+          if (meta.lastActionObjectName) {
+              const objectSplit = meta.lastActionObjectName.split('_');
+              objectName = objectSplit[0];
+              objectId = objectSplit[1];
+          }
+
           const message = `<div class="log-message" style="color: ${meta.lastActionSuccess ? "green" : "red"}">
-            Agent took action ${meta.lastAction}
-            on ${meta.lastActionObjectId.split("|", 1)[0]}
+            Action ${meta.lastAction}
+            on ${objectName}${objectId ? " (" + objectId + ")" : ""}
             at location (${formatter.format(meta.agent.x)}, ${formatter.format(meta.agent.y)}, ${formatter.format(meta.agent.z)})
             which ${meta.lastActionSuccess ? "succeeded" : "failed"}
             </div>`;

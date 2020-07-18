@@ -67,8 +67,28 @@
               <button id="end-tutorial-button" style="display: none" class="event-log button btn-secondary">End Tutorial</button>
             </div>
 
+            <div id="game-ready" class="event-log row">
+              <button id="game-ready-button" style="display: none" class="event-log button btn-secondary">Game Ready</button>
+            </div>
+
+            <div id="game-form-parent" class="row" >
+              <form id="game-form" style="display: none">
+                <div class="form-group">
+                    <label for="game-name-input">Game Name</label>
+                    <input type="text" class="form-control" id="game-name-input" placeholder="Enter game name">
+                </div>
+
+                <div class="form-group">
+                    <label for="game-description-input">Game Description</label>
+                    <textarea class="form-control" id="game-description-input" rows="4" placeholder="Please explain your game and how it is scored"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </form>
+            </div>
+
             <div class="row controls-row">
-              <p class="instructions-title">Controls</p>
+              <p class="controls-title">Controls</p>
             </div>
 
             <!-- <div class="row controls-row">
