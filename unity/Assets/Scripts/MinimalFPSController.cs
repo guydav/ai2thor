@@ -32,8 +32,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 smoothTime = 5,
                 lockCursor = false
             };
-            this.m_WalkSpeed = 2;
-            this.m_RunSpeed = 4;
+            this.m_WalkSpeed = 4;
+            this.m_RunSpeed = 8;
             this.m_GravityMultiplier = 2;
             this.enableHighlightShader = false;
         }

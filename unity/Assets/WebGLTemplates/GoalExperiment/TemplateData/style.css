@@ -165,6 +165,14 @@ canvas {
   width: 80px;
 }
 
+.instruction-set {
+  margin-bottom: 1em;
+}
+
+.game-heading {
+  font-weight: bold;
+}
+
 .instructions {
     /*width: 10%;*/
     /*background-color: #231e20;*/

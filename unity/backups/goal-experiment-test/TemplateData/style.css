@@ -133,13 +133,6 @@ canvas {
     text-align: center;
 }
 
-.controls-title {
-  margin-top: 8px;
-  background-color: #1887b9;
-  color: white;
-  text-align: center;
-}
-
 .instructions-title.submit {
     background-color: #1887b9;
     color: white;
@@ -170,6 +163,14 @@ canvas {
 
 .controls-img-large {
   width: 80px;
+}
+
+.instruction-set {
+  margin-bottom: 1em;
+}
+
+.game-heading {
+  font-weight: bold;
 }
 
 .instructions {

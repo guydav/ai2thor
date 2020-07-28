@@ -19,8 +19,14 @@ function($, _, bootstrap, UnityProgress) {
   $(
     () => {
 
-      // import * as _ from 'underscore'; // Should this be an import?
-      const _ = require('underscore');
+      function ID() {
+        // Math.random should be unique because of its seeding algorithm.
+        // Convert it to base 36 (numbers + letters), and grab the first 9 characters
+        // after the decimal.
+        return '_' + Math.random().toString(36).substr(2, 9);
+      };
+
+      const playerID = ID();
 
       let gameInstance = null;
       let getParams = parseGet();
@@ -31,7 +37,7 @@ function($, _, bootstrap, UnityProgress) {
       let hider = getParams['role'] !== 'seeker';
       let gameInitialized  = false;
       let objectId = '';
-      let spawnRandomSeed = 'spawnSeed' in getParams ? parseInt(getParams['spawnSeed']) : 0;
+      let spawnRandomSeed = 'spawnSeed' in getParams ? parseInt(getParams['spawnSeed']) : 10;
       let objectsRandomSeed = 'objectsSeed' in getParams ? parseInt(getParams['objectsSeed']) : 0;
       let outputData = {
         object_type: getParams['object'],
@@ -71,23 +77,48 @@ function($, _, bootstrap, UnityProgress) {
                .reduce((sum, now) => sum + now) // sum
                ** (1/2);
         }
+
+        findObjectsByPattern(re, objectArray) {
+          return objectArray.filter((obj) => re.test(obj.name));
+        }
       }
 
       class ObjectActionInstruction extends Instruction {
-        constructor(text, objectName, actionName, id) {
+        constructor(text, objectPattern, actionPattern, id) {
           super(text, null, id);
-          this.actionName = actionName;
-          this.objectName = objectName;
+          this.objectRE = new RegExp(objectPattern);
+          this.actionRE = new RegExp(actionPattern);
         }
 
         evaluate(metadata) {
-          return (this.actionName === metadata.lastAction) && (metadata.lastActionObjectName.startsWith(this.objectName));
+          return this.actionRE.test(metadata.lastAction) && this.objectRE.test(metadata.lastActionObjectName);
+        }
+      }
+
+      class RepeatedObjectActionInstruction extends ObjectActionInstruction {
+        constructor(text, objectPattern, actionPattern, times, id) {
+          super(text, objectPattern, actionPattern, id);
+          if (!times) {
+            times = 2;
+          }
+          this.times = times;
+          this.counter = 0;
+          this.blackList = [];
+        }
+
+        evaluate(metadata) {
+          if (!this.blackList.includes(metadata.lastActionObjectName) && super.evaluate(metadata)) {
+            this.blackList.push(metadata.lastActionObjectName);
+            this.counter += 1;
+          }
+
+          return (this.counter >= this.times);
         }
       }
 
       class ObjectActionPositionInstruction extends ObjectActionInstruction {
-        constructor(text, objectName, actionName, position, id, tolerance = 0.01) {
-          super(text, objectName, actionName, id);
+        constructor(text, objectPattern, actionPattern, position, id, tolerance = 0.01) {
+          super(text, objectPattern, actionPattern, id);
           this.position = position;
           this.tolerance = tolerance;
         }
@@ -100,15 +131,15 @@ function($, _, bootstrap, UnityProgress) {
       }
 
       class ObjectStatusInstruction extends Instruction {
-        constructor(text, objectName, statusName, id, statusValue = true) {
+        constructor(text, objectPattern, statusName, id, statusValue = true) {
           super(text, null, id);
-          this.objectName = objectName;
+          this.objectRE = new RegExp(objectPattern);
           this.statusName = statusName;
           this.statusValue = statusValue;
         }
 
         evaluate(metadata) {
-          const filtered = metadata.allObjects.filter((obj) => obj.name.startsWith(this.objectName));
+          const filtered = this.findObjectsByPattern(self.objectRE, metadata.allObjects);
           for (const targetObject of filtered) {
             if (targetObject[this.statusName] == this.statusValue) {
               return true;
@@ -119,15 +150,15 @@ function($, _, bootstrap, UnityProgress) {
       }
 
       class ObjectPositionInstruction extends Instruction {
-        constructor(text, objectName, position, id, tolerance = 0.25) {
+        constructor(text, objectPattern, position, id, tolerance = 0.25) {
           super(text, null, id);
-          this.objectName = objectName;
+          this.objectRE = new RegExp(objectPattern);
           this.position = position;
           this.tolerance = tolerance;
         }
 
         evaluate(metadata) {
-          const filtered = metadata.allObjects.filter((obj) => obj.name.startsWith(this.objectName));
+          const filtered = this.findObjectsByPattern(self.objectRE, metadata.allObjects);
           for (const targetObject of filtered) {
             let pos = targetObject.position;
             let posArr = [pos.x, pos.y, pos.z];
@@ -148,13 +179,22 @@ function($, _, bootstrap, UnityProgress) {
       // 6 Fill it with water
       // 7 Put it on the stove
 
+      // const instructions = [
+      //   new ObjectActionInstruction('Open the fridge', 'Fridge', 'OpenObject'),
+      //   new ObjectActionInstruction('Pick up the apple from the table', 'Apple', 'PickupObject'),
+      //   new ObjectPositionInstruction('Put the apple in the fridge', 'Apple', [-2.145, 0.845, 1.13]),
+      //   new ObjectActionInstruction('Close the fridge', 'Fridge', 'CloseObject'),
+      //   new ObjectActionInstruction('Pick up the pot', 'Pot', 'PickupObject'),
+      //   new ObjectStatusInstruction('Fill the pot with water', 'Pot', 'isFilledWithLiquid')
+      // ];
+
       const instructions = [
-        new ObjectActionInstruction('Open the fridge', 'Fridge', 'OpenObject'),
-        new ObjectActionInstruction('Pick up the apple from the table', 'Apple', 'PickupObject'),
-        new ObjectPositionInstruction('Put the apple in the fridge', 'Apple', [-2.145, 0.845, 1.13]),
-        new ObjectActionInstruction('Close the fridge', 'Fridge', 'CloseObject'),
-        new ObjectActionInstruction('Pick up the pot', 'Pot', 'PickupObject'),
-        new ObjectStatusInstruction('Fill the pot with water', 'Pot', 'isFilledWithLiquid')
+        new RepeatedObjectActionInstruction('Many objects can be picked up. Pick up and drop at least two different objects. ', '.*', 'PickupObject', 2),
+        new ObjectActionInstruction('Once you pick up an object, you can move it closer or farther away. First, pick up an object.', '.*', 'PickupObject'),
+        new ObjectActionInstruction('Now, use the scrollwheel to move it.', '.*', 'MoveHandDelta'),
+        new RepeatedObjectActionInstruction('Other objects can be opened and closed. Open at least two different objects. ', '.*', 'OpenObject', 2),
+        new ObjectActionInstruction('Other yet objects can be toggled. Find one and toggle it.', '.*', 'ToggleObject.*'),
+        new ObjectActionInstruction('Do we want another instruction on object states?', '.*', 'ToggleObject.*'),
       ];
 
       // TODO render out instructions
@@ -208,6 +248,58 @@ function($, _, bootstrap, UnityProgress) {
         $('#game-form').css('display', 'block');
       });
 
+      $('#game-form .form-control').keyup(() => {
+        const values = [$('#game-name-input').val().trim(),
+          $('#game-description-input').val().trim(),
+          $('#game-scoring-input').val().trim()];
+
+        if (values.every((val) => { return val.length > 0;})) {
+          $('#game-form button[type=submit]').removeAttr('disabled');
+        } else {
+          $('#game-form button[type=submit]').attr('disabled', 'disabled');
+        }
+      });
+
+      $('#game-score-form .form-control').keyup(() => {
+        const values = [$('#game-score-input').val().trim(),
+          $('#game-score-explanation').val().trim()];
+
+        if (values.every((val) => { return val.length > 0;})) {
+          $('#game-score-form button[type=submit]').removeAttr('disabled');
+        } else {
+          $('#game-score-form button[type=submit]').attr('disabled', 'disabled');
+        }
+      });
+
+      let gameInfo = null;
+
+      $('#game-form').submit((event) => {
+        event.preventDefault();
+        console.log(event);
+        gameInfo = {
+          playerID: playerID,
+          timestamp: Date.now(),
+          name: $('#game-name-input').val(),
+          description: $('#game-description-input').val(),
+          scoring: $('#game-scoring-input').val()
+        }
+        console.log(gameInfo);
+
+        // TODO: write to file -- this requires an endpoint in WebGL or whatever runs this
+        $('#play-game-name').append(gameInfo.name);
+        $('#play-game-description').append(gameInfo.description);
+        $('#play-game-scoring').append(gameInfo.scoring);
+
+        $('#instructions').css('display', 'none');
+        $('#game-form').css('display', 'none');
+        $('#play-game').css('display', 'block');
+      });
+
+      $('#game-score-form').submit((event) => {
+        event.preventDefault();
+        // TODO: optional game editing phase
+      });
+
 
       // Utils
       function paramStrToAssocArray(prmstr) {
@@ -235,11 +327,17 @@ function($, _, bootstrap, UnityProgress) {
             gameInstance.SendMessage('PhysicsSceneManager', 'SwitchScene', getParams['scene']);
           }
           gameInitialized = true;
+
+          gameInstance.SendMessage ('FPSController', 'Step', JSON.stringify({
+            action: "RandomlyMoveAgent",
+            randomSeed: spawnRandomSeed
+          }));
         }
       };
 
       window.onUnityMetadata = function(metadata) {
         let jsonMeta = JSON.parse(metadata);
+
         // FIRST init event
         console.log('Unity Metadata:');
         console.log(jsonMeta);
@@ -563,7 +661,6 @@ function($, _, bootstrap, UnityProgress) {
         $('#event-log').empty();
       });
 
-
       function initGame(url) {
         const t0 = performance.now();
         gameInstance = UnityLoader.instantiate("gameContainer", url, {
@@ -574,13 +671,16 @@ function($, _, bootstrap, UnityProgress) {
               const t1 = performance.now();
               console.log(`Load finished. Took: ${(t1 - t0) / 1000}s`);
 
+              // Adding this to allow keyboard input to be captured when focused
+              $('canvas').attr("tabindex", "1");
+
               var container = document.getElementById("gameContainer");
               container.addEventListener('click', function () {
                 if (document.pointerLockElement === null) {
                   this.requestPointerLock();
                   gameInstance.SendMessage('FPSController', 'EnableMouseControl');
                 }
-              })
+              });
             },
           }
         });

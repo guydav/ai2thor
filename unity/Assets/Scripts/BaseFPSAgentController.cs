@@ -699,7 +699,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         //XXX revisit what movement means when we more clearly define what "continuous" movement is
         protected bool moveInDirection(Vector3 direction, string objectId="", float maxDistanceToObject=-1.0f, bool forceAction = false) {
-						Console.WriteLine("moveInDirection reached for objectId " + objectId);
+			Console.WriteLine("BaseFPSAgentController.moveInDirection reached for objectId " + objectId);
 
             Vector3 targetPosition = transform.position + direction;
             float angle = Vector3.Angle(transform.forward, Vector3.Normalize(direction));
@@ -709,7 +709,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 angle = 360f - angle;
             }
             int angleInt = Mathf.RoundToInt(angle) % 360;
-						bool status;
+			bool status;
 
             if (checkIfSceneBoundsContainTargetPosition(targetPosition) &&
                 CheckIfItemBlocksAgentMovement(direction.magnitude, angleInt, forceAction) && // forceAction = true allows ignoring movement restrictions caused by held objects
@@ -737,23 +737,23 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 status = false;
             }
 
-						#if UNITY_WEBGL
-						JavaScriptInterface jsInterface = this.GetComponent<JavaScriptInterface>();
+            #if UNITY_WEBGL
+            JavaScriptInterface jsInterface = this.GetComponent<JavaScriptInterface>();
             if (jsInterface != null) {
-							MovementWrapper movement = new MovementWrapper();
-							movement.position = transform.position;
-							movement.rotationEulerAngles = transform.rotation.eulerAngles;
-							movement.direction = direction;
-							movement.targetPosition = targetPosition;
-							movement.angle = angle;
-							movement.angleInt = angleInt;
-							movement.succeeded = status;
+                MovementWrapper movement = new MovementWrapper();
+                movement.position = transform.position;
+				movement.rotationEulerAngles = transform.rotation.eulerAngles;
+				movement.direction = direction;
+				movement.targetPosition = targetPosition;
+				movement.angle = angle;
+				movement.angleInt = angleInt;
+				movement.succeeded = status;
 
-							jsInterface.SendMovementData(movement);
-						}
-		        #endif
+                jsInterface.SendMovementData(movement);
+			}
+		    #endif
 
-						return status;
+			return status;
         }
 
         protected float distanceToObject(SimObjPhysics sop) {

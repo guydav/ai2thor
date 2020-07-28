@@ -59,11 +59,11 @@
               <p class="instructions-title">Instructions</p>
             </div>
 
-            <div id="instructions" class="log-button row">
+            <div id="instructions" class="log-button row instruction-set">
 
             </div>
 
-            <div id="tutorial-end" class="event-log row">
+            <div id="tutorial-end" class="event-log row instruction-set">
               <button id="end-tutorial-button" style="display: none" class="event-log button btn-secondary">End Tutorial</button>
             </div>
 
@@ -80,15 +80,50 @@
 
                 <div class="form-group">
                     <label for="game-description-input">Game Description</label>
-                    <textarea class="form-control" id="game-description-input" rows="4" placeholder="Please explain your game and how it is scored"></textarea>
+                    <textarea class="form-control" id="game-description-input" rows="3" placeholder="Please explain your game"></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <div class="form-group">
+                    <label for="game-scoring-input">Game Scoring</label>
+                    <textarea class="form-control" id="game-scoring-input" rows="2" placeholder="Please explain how your game and is scored"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" disabled>Submit</button>
+              </form>
+            </div>
+
+            <div id="play-game" class="log-button row" style="display: none;">
+              <div id="play-game-instructions" class="instruction-set">
+                <div class="log-message" id="play-game-name">
+                  <span class="game-heading">Game name:</span>
+                </div>
+                <div class="log-message" id="play-game-description">
+                  <span class="game-heading">Game description:</span>
+                </div>
+                <div class="log-message" id="play-game-scoring">
+                  <span class="game-heading">Game scoring:</span>
+                </div>
+              </div>
+              <div class="log-message">
+                When you're done, please score yourself:
+              </div>
+              <form id="game-score-form">
+                <div class="form-group">
+                    <label for="game-score-input">Score</label>
+                    <input type="text" class="form-control" id="game-score-input" placeholder="Enter your score">
+                </div>
+
+                <div class="form-group">
+                    <label for="game-score-explanation">Scoring Explanation</label>
+                    <textarea class="form-control" id="game-score-explanation" rows="3" placeholder="Please explain the scoring"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" disabled>Submit</button>
               </form>
             </div>
 
             <div class="row controls-row">
-              <p class="controls-title">Controls</p>
+              <p class="instructions-title">Controls</p>
             </div>
 
             <!-- <div class="row controls-row">

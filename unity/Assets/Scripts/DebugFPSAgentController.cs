@@ -22,8 +22,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
 		[SerializeField] protected bool m_IsWalking;
 		[SerializeField] protected float m_WalkSpeed;
 		[SerializeField] protected float m_RunSpeed;
+        protected float m_CustomSpeedFactor;
 
-		[SerializeField] protected float m_GravityMultiplier;
+        [SerializeField] protected float m_GravityMultiplier;
 		[SerializeField] protected MouseLook m_MouseLook;
 
         [SerializeField] protected GameObject Debug_Canvas = null;
@@ -79,8 +80,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 Cursor.lockState = CursorLockMode.None;
                 HideHUD();
             #endif
+            #if !UNITY_EDITOR && UNITY_WEBGL
+                WebGLInput.captureAllKeyboardInput = false;
+            #endif
+
+            m_CustomSpeedFactor = 2.0f;
         }
-		public Vector3 ScreenPointMoveHand(float yOffset)
+        public Vector3 ScreenPointMoveHand(float yOffset)
 		{
 			RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -284,7 +290,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			m_IsWalking = !Input.GetKey(KeyCode.LeftShift);
 			#endif
 			// set the desired speed to be walking or running
-			speed = m_IsWalking ? m_WalkSpeed : m_RunSpeed;
+			speed = (m_IsWalking ? m_WalkSpeed : m_RunSpeed) * m_CustomSpeedFactor;
 			m_Input = new Vector2(horizontal, vertical);
 
 			// normalize input if it exceeds 1 in combined length:
@@ -306,6 +312,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
         private void FPSInput()
 		{
+            // This is the actual movement function
+            //Console.WriteLine("DebugFPSAgentController.FPSInput reached");
             //take WASD input and do magic, turning it into movement!
             float speed;
             GetInput(out speed);
@@ -321,7 +329,16 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_MoveDir.x = desiredMove.x * speed;
             m_MoveDir.z = desiredMove.z * speed;
 
-						// if(!FlightMode)
+            if (m_Input != Vector2.zero)
+            {
+                Console.WriteLine(String.Format("Speed: {0}, m_Input: {1}, desiredMove: {2}, m_MoveDir: {3}",
+                    speed, m_Input, desiredMove, m_MoveDir));
+                Console.WriteLine(String.Format("isWalking: {0}, m_WalkSpeed: {1}, m_RunSpeed: {2}, m_CustomSpeedFactor: {3}",
+                    m_IsWalking, m_WalkSpeed, m_RunSpeed, m_CustomSpeedFactor));
+            }
+            
+
+            // if(!FlightMode)
             m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime;
 
             //added this check so that move is not called if/when the Character Controller's capsule is disabled. Right now the capsule is being disabled when open/close animations are in progress so yeah there's that

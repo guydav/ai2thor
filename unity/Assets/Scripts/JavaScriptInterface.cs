@@ -76,4 +76,10 @@ public class JavaScriptInterface : MonoBehaviour {
         JsonUtility.FromJsonOverwrite(serverAction, controlCommand);
         PhysicsController.ProcessControlCommand(controlCommand);
     }
+
+    public void SaveData(string path, string jsonData)
+    {
+        System.IO.File.WriteAllText(path, jsonData);
+    }
+
 }
