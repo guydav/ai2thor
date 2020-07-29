@@ -56,6 +56,15 @@ function($, _, bootstrap, UnityProgress) {
       let pickupFailTimeout = false;
       let hasObject = false;
 
+      const csrf_token = $('#csrf').val();
+      $.ajaxSetup({
+          beforeSend: function(xhr, settings) {
+              if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                  xhr.setRequestHeader("X-CSRFToken", csrf_token);
+              }
+          }
+      });
+
       class Instruction {
         constructor(text, evaluator, id) {
           this.text = text;
@@ -193,11 +202,10 @@ function($, _, bootstrap, UnityProgress) {
         new ObjectActionInstruction('Once you pick up an object, you can move it closer or farther away. First, pick up an object.', '.*', 'PickupObject'),
         new ObjectActionInstruction('Now, use the scrollwheel to move it.', '.*', 'MoveHandDelta'),
         new RepeatedObjectActionInstruction('Other objects can be opened and closed. Open at least two different objects. ', '.*', 'OpenObject', 2),
-        new ObjectActionInstruction('Other yet objects can be toggled. Find one and toggle it.', '.*', 'ToggleObject.*'),
+        new ObjectActionInstruction('Other yet objects can be toggled (switched on and off). Find one and toggle it.', '.*', 'ToggleObject.*'),
         new ObjectActionInstruction('Do we want another instruction on object states?', '.*', 'ToggleObject.*'),
       ];
 
-      // TODO render out instructions
       instructions.forEach((instruction, index) => {
         if (!instruction.id) {
           instruction.id = `instruction-${index}`;
@@ -271,28 +279,36 @@ function($, _, bootstrap, UnityProgress) {
         }
       });
 
-      let gameInfo = null;
+      let gameInfo = {};
 
       $('#game-form').submit((event) => {
         event.preventDefault();
-        console.log(event);
-        gameInfo = {
-          playerID: playerID,
-          timestamp: Date.now(),
-          name: $('#game-name-input').val(),
-          description: $('#game-description-input').val(),
-          scoring: $('#game-scoring-input').val()
-        }
-        console.log(gameInfo);
+        // console.log(event);
+        const form = $('#game-form');
 
-        // TODO: write to file -- this requires an endpoint in WebGL or whatever runs this
-        $('#play-game-name').append(gameInfo.name);
-        $('#play-game-description').append(gameInfo.description);
-        $('#play-game-scoring').append(gameInfo.scoring);
+        form.append(`<input type="hidden" name="player_id" value="${playerID}" />`);
+        // Adding the timestamp on the server-side
+        // form.append(`<input type="hidden" name="timestamp" value="${Date.now()}" />`);
 
-        $('#instructions').css('display', 'none');
-        $('#game-form').css('display', 'none');
-        $('#play-game').css('display', 'block');
+        form.serializeArray().forEach((formField) => {
+          gameInfo[formField.name] = formField.value;
+        });
+
+        $.ajax({
+          url: 'save_game',
+          type: 'POST',
+          data: form.serialize(),
+          // contentType: 'application/json',
+          beforeSend: function() {
+            return;
+          }
+            // TODO: show a message after submitting while it's saving?
+        }).done(function(data) {
+            console.log('Done data:');
+            console.log(data);
+            afterGameSave();
+        });
+        // Optionally, can add .always or .fail handlers, or use .then to deal with $.Deferred
       });
 
       $('#game-score-form').submit((event) => {
@@ -300,6 +316,35 @@ function($, _, bootstrap, UnityProgress) {
         // TODO: optional game editing phase
       });
 
+      function afterGameSave() {
+        $('#play-game-name').append(gameInfo.name);
+        $('#play-game-description').append(gameInfo.description);
+        $('#play-game-scoring').append(gameInfo.scoring);
+
+        $('#instructions').css('display', 'none');
+        $('#game-form').css('display', 'none');
+        $('#play-game').css('display', 'block');
+      }
+
+      // function savaData(url, type, ajaxData) {
+      //   console.log('Ajax data:');
+      //   console.log(ajaxData);
+      //   $.ajax({
+      //     url: url,
+      //     type: type,
+      //     data: JSON.stringify({name: 'test', value: 'test value'}),
+      //     contentType: 'application/json',
+      //     beforeSend: function() {
+      //       return;
+      //     }
+      //       // TODO: show a message after submitting while it's saving?
+      //   }).done(function(data) {
+      //       console.log('Done data:');
+      //       console.log(data);
+      //       afterGameSave(ajaxData);
+      //   });
+      //   // Optionally, can add .always or .fail handlers, or use .then to deal with $.Deferred
+      // }
 
       // Utils
       function paramStrToAssocArray(prmstr) {
@@ -354,8 +399,8 @@ function($, _, bootstrap, UnityProgress) {
       window.onUnityMovement = function(movement) {
         let jsonMovement = JSON.parse(movement);
         // FIRST init event
-        console.log('Unity Movement:');
-        console.log(jsonMovement);
+        // console.log('Unity Movement:');
+        // console.log(jsonMovement);
       };
 
       // Aggregate data

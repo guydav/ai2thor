@@ -7,7 +7,8 @@
       <script>
       window.game_build = ".";
       window.game_url =  "Build/goal-experiment-test.json";
-        // document.onmousedown = function() {window.focus();};
+      // window.game_build = ".";
+      // window.game_url =  "Build/goal-experiment-test.json";
       </script>
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
 
@@ -56,7 +57,7 @@
           <div class="side-col col-md-3">
 
             <div class="row controls-row">
-              <p class="instructions-title">Instructions</p>
+              <p class="instructions-title">Tutorial Instructions</p>
             </div>
 
             <div id="instructions" class="log-button row instruction-set">
@@ -67,27 +68,28 @@
               <button id="end-tutorial-button" style="display: none" class="event-log button btn-secondary">End Tutorial</button>
             </div>
 
-            <div id="game-ready" class="event-log row">
+            <div id="game-ready" class="event-log row instruction-set">
               <button id="game-ready-button" style="display: none" class="event-log button btn-secondary">Game Ready</button>
             </div>
 
             <div id="game-form-parent" class="row" >
-              <form id="game-form" style="display: none">
+              <form id="game-form">
+                <!-- style="display: none" -->
                 <div class="form-group">
                     <label for="game-name-input">Game Name</label>
-                    <input type="text" class="form-control" id="game-name-input" placeholder="Enter game name">
+                    <input type="text" class="form-control" id="game-name-input" name="name" placeholder="Enter game name">
                 </div>
 
                 <div class="form-group">
                     <label for="game-description-input">Game Description</label>
-                    <textarea class="form-control" id="game-description-input" rows="3" placeholder="Please explain your game"></textarea>
+                    <textarea class="form-control" id="game-description-input" name="description" rows="3" placeholder="Please explain your game"></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="game-scoring-input">Game Scoring</label>
-                    <textarea class="form-control" id="game-scoring-input" rows="2" placeholder="Please explain how your game and is scored"></textarea>
+                    <textarea class="form-control" id="game-scoring-input" name="scoring" rows="2" placeholder="Please explain how your game and is scored"></textarea>
                 </div>
-
+                <input type="hidden" id='csrf' name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-primary" disabled>Submit</button>
               </form>
             </div>
@@ -117,7 +119,7 @@
                     <label for="game-score-explanation">Scoring Explanation</label>
                     <textarea class="form-control" id="game-score-explanation" rows="3" placeholder="Please explain the scoring"></textarea>
                 </div>
-
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 <button type="submit" class="btn btn-primary" disabled>Submit</button>
               </form>
             </div>

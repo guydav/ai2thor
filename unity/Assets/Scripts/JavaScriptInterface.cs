@@ -77,9 +77,4 @@ public class JavaScriptInterface : MonoBehaviour {
         PhysicsController.ProcessControlCommand(controlCommand);
     }
 
-    public void SaveData(string path, string jsonData)
-    {
-        System.IO.File.WriteAllText(path, jsonData);
-    }
-
 }

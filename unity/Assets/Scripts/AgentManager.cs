@@ -1292,6 +1292,13 @@ public class InitializeReturn
     public float cameraFarPlane;
 }
 
+[Serializable]
+public class SaveData
+{
+	public string path;
+	public string data;
+}
+
 public enum ServerActionErrorCode  {
 	Undefined,
 	ReceptacleNotVisible,
