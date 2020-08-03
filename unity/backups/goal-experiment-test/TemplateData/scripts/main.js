@@ -285,7 +285,6 @@ function($, _, bootstrap, UnityProgress) {
         event.preventDefault();
         // console.log(event);
         const form = $('#game-form');
-
         form.append(`<input type="hidden" name="player_id" value="${playerID}" />`);
         // Adding the timestamp on the server-side
         // form.append(`<input type="hidden" name="timestamp" value="${Date.now()}" />`);
@@ -304,27 +303,89 @@ function($, _, bootstrap, UnityProgress) {
           }
             // TODO: show a message after submitting while it's saving?
         }).done(function(data) {
-            console.log('Done data:');
+            console.log('Done save_game data:');
             console.log(data);
-            afterGameSave();
+            gameInfo['id'] = data['id']
+            startGamePlay();
         });
         // Optionally, can add .always or .fail handlers, or use .then to deal with $.Deferred
       });
 
-      $('#game-score-form').submit((event) => {
-        event.preventDefault();
-        // TODO: optional game editing phase
-      });
+      function createGameSpan(text) {
+        return `<span class="game-info-span">${text}</span>`;
+      }
 
-      function afterGameSave() {
-        $('#play-game-name').append(gameInfo.name);
-        $('#play-game-description').append(gameInfo.description);
-        $('#play-game-scoring').append(gameInfo.scoring);
+      function startGamePlay() {
+        $('#play-game-name').append(createGameSpan(gameInfo.name));
+        $('#play-game-description').append(createGameSpan(gameInfo.description));
+        $('#play-game-scoring').append(createGameSpan(gameInfo.scoring));
 
         $('#instructions').css('display', 'none');
         $('#game-form').css('display', 'none');
         $('#play-game').css('display', 'block');
       }
+
+      $('#game-score-form').submit((event) => {
+        event.preventDefault();
+        const form = $('#game-score-form');
+        form.append(`<input type="hidden" name="player_id" value="${playerID}" />`);
+        form.append(`<input type="hidden" name="game_id" value="${gameInfo.id}" />`);
+
+        $.ajax({
+          url: 'save_game_score',
+          type: 'POST',
+          data: form.serialize(),
+          // contentType: 'application/json',
+          beforeSend: function() {
+            return;
+          }
+            // TODO: show a message after submitting while it's saving?
+        }).done(function(data) {
+            console.log('Done save_game_score data:');
+            console.log(data);
+            afterGameScore();
+        });
+      });
+
+      function endExperiment() {
+        // TODO: transition to any post-experiment questionnaires
+        // TODO: show an alert for the time being
+        alert('Thank you for completing the experiment!');
+      }
+
+      function afterGameScore() {
+        $(':input', '#game-score-form')
+          .not(':button, :submit, :reset, :hidden')
+          .val('')
+          .prop('checked', false)
+          .prop('selected', false);
+          
+        $('#play-game').css('display', 'none');
+
+        // First, send the ajax request to get another game
+        // only if there's a valid one, offer the chance to end
+
+        $.ajax({
+          url: `find_game_to_play/${playerID}`,
+          type: 'GET',
+          // data: {player_id: playerID},
+        }).done(function(result) {
+          if ('status' in result && result['status']) {
+              $('#play-another-game').css('display', 'block');
+              gameInfo = result['game'];
+          } else {
+            endExperiment();
+          }
+        });
+      }
+
+      $('#play-another-game-button').click(function() {
+        $('#play-another-game').css('display', 'none');
+        $('.game-info-span').remove();
+        startGamePlay();
+      });
+
+      $('#end-experiment-button').click(endExperiment);
 
       // function savaData(url, type, ajaxData) {
       //   console.log('Ajax data:');
@@ -341,7 +402,7 @@ function($, _, bootstrap, UnityProgress) {
       //   }).done(function(data) {
       //       console.log('Done data:');
       //       console.log(data);
-      //       afterGameSave(ajaxData);
+      //       startGamePlay(ajaxData);
       //   });
       //   // Optionally, can add .always or .fail handlers, or use .then to deal with $.Deferred
       // }

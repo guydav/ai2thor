@@ -1,11 +1,16 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import scoped_session, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, TIMESTAMP, func
+import random
 
+# Flask:
 from flask import Flask, render_template, jsonify, request, g
 # using Flask-WTF CSRF protection for AJAX requests
 from flask_wtf.csrf import CSRFProtect
+
+# SQL Alchemy:
+import sqlalchemy
+from sqlalchemy import create_engine, func, inspect
+from sqlalchemy import Column, ForeignKey, Integer, String, TIMESTAMP
+from sqlalchemy.orm import relationship, scoped_session, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 app = Flask(__name__, static_folder="./", template_folder="./")
 csrf = CSRFProtect(app)
@@ -23,23 +28,39 @@ db_session = scoped_session(sessionmaker(autocommit=False,
 Base = declarative_base()
 Base.query = db_session.query_property()
 
-### SQL Aclhemy model
+### SQL Alchemy model
+
+# TODO: Add a 'Player' class, to link to both the game and game scores?
+
 class Game(Base):
     __tablename__ = 'games'
     id = Column(Integer, primary_key=True)
-    player_id = Column(String(32), unique=True)
-    name = Column(String(64))
-    description = Column(String(256))
-    scoring = Column(String(256))
+    player_id = Column(String(32), nullable=False)
+    name = Column(String(64), nullable=False)
+    description = Column(String(256), nullable=False)
+    scoring = Column(String(256), nullable=False)
     timestamp = Column(TIMESTAMP(timezone=True),  server_default=func.now())
+    games_scored = relationship('GameScore')
 
-    def __init__(self, player_id=None, name=None, description=None,
-                 scoring=None, timestamp=None, **kwargs):
-        self.player_id = player_id
-        self.name = name
-        self.description = description
-        self.scoring = scoring
-        self.timestamp = timestamp
+
+class GameScore(Base):
+    __tablename__ = 'game_scores'
+    id = Column(Integer, primary_key=True)
+    game_id = Column(Integer, ForeignKey('games.id'), nullable=False)
+    player_id = Column(String(32), nullable=False)
+    score = Column(String(32), nullable=False)
+    explanation = Column(String(256))
+    feedback = Column(String(256))
+
+
+def filter_dict_to_model(value_dict, model_class):
+    valid_keys = [prop.key for prop in inspect(model_class).iterate_properties
+        if isinstance(prop, sqlalchemy.orm.ColumnProperty)]
+    return {key: value_dict[key] for key in value_dict if key in valid_keys}
+
+
+def model_to_dict(model_instance):
+    return filter_dict_to_model(model_instance.__dict__, model_instance.__class__)
 
 
 def init_db():
@@ -65,11 +86,7 @@ def home():
 
 @app.route('/save_game', methods=['POST'])
 def save_game():
-    # print('In save_game')
-    # print(request.form)
-    # print({key: request.form[key] for key in request.form})
-    # print(dict(**request.form))
-    game = Game(**request.form)
+    game = Game(**filter_dict_to_model(request.form, Game))
     query = Game.query.filter(Game.player_id == game.player_id)
     if query.count() > 0:
         game.id = query.first().id
@@ -82,6 +99,28 @@ def save_game():
     db_session.commit()
 
     return jsonify({'id': game.id, 'player_id': game.player_id})
+
+
+@app.route('/save_game_score', methods=['POST'])
+def save_game_score():
+    game_score = GameScore(**filter_dict_to_model(request.form, GameScore))
+    db_session.add(game_score)
+    db_session.commit()
+
+    return jsonify(dict(id=game_score.id, player_id=game_score.player_id,
+        game_id=game_score.game_id))
+
+
+@app.route('/find_game_to_play/<player_id>', methods=['GET'])
+def find_game_to_play(player_id):
+    games_not_created_query = Game.query.filter(Game.player_id != player_id)
+    games_not_played_query = games_not_created_query.filter(~Game.games_scored.any(GameScore.player_id == player_id))
+    results = games_not_played_query.all()
+    if len(results) > 0:
+        game = random.choice(results)
+        return jsonify(dict(status=True, game=model_to_dict(game)))
+
+    return jsonify(dict(status=False))
 
 
 if __name__ == "__main__":

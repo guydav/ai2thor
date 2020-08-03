@@ -329,13 +329,13 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_MoveDir.x = desiredMove.x * speed;
             m_MoveDir.z = desiredMove.z * speed;
 
-            if (m_Input != Vector2.zero)
-            {
-                Console.WriteLine(String.Format("Speed: {0}, m_Input: {1}, desiredMove: {2}, m_MoveDir: {3}",
-                    speed, m_Input, desiredMove, m_MoveDir));
-                Console.WriteLine(String.Format("isWalking: {0}, m_WalkSpeed: {1}, m_RunSpeed: {2}, m_CustomSpeedFactor: {3}",
-                    m_IsWalking, m_WalkSpeed, m_RunSpeed, m_CustomSpeedFactor));
-            }
+            //if (m_Input != Vector2.zero)
+            //{
+                //Console.WriteLine(String.Format("Speed: {0}, m_Input: {1}, desiredMove: {2}, m_MoveDir: {3}",
+                //    speed, m_Input, desiredMove, m_MoveDir));
+                //Console.WriteLine(String.Format("isWalking: {0}, m_WalkSpeed: {1}, m_RunSpeed: {2}, m_CustomSpeedFactor: {3}",
+                    //m_IsWalking, m_WalkSpeed, m_RunSpeed, m_CustomSpeedFactor));
+            //}
             
 
             // if(!FlightMode)
