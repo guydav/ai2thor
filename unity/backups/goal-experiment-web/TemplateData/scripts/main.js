@@ -239,7 +239,7 @@ function($, _, bootstrap, UnityProgress) {
       }
 
       $('#end-tutorial-button').click(function() {
-        gameInstance.SendMessage('PhysicsSceneManager', 'SwitchScene', 'FloorPlan326_physics');
+        gameInstance.SendMessage('PhysicsSceneManager', 'SwitchScene', 'FloorPlan7_physics');
         gameInstance.SendMessage('FPSController', 'Step', JSON.stringify({
           action: "RandomlyMoveAgent",
           randomSeed: spawnRandomSeed
@@ -437,7 +437,7 @@ function($, _, bootstrap, UnityProgress) {
           if ('scene' in getParams && getParams['scene']) {
             gameInstance.SendMessage('PhysicsSceneManager', 'SwitchScene', getParams['scene']);
           } else {
-            gameInstance.SendMessage('PhysicsSceneManager', 'SwitchScene', 'FloorPlan302_physics');
+            gameInstance.SendMessage('PhysicsSceneManager', 'SwitchScene', 'FloorPlan418_physics');
           }
           gameInitialized = true;
 

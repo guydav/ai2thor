@@ -118,7 +118,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
         protected string lastActionObjectName;
 		protected string lastActionReceptacleObjectType;
 		protected string lastActionRceptacleObjectId;
-		protected string errorMessage;
+        protected float lastActionX;
+        protected float lastActionY;
+        protected float lastActionZ;
+        protected string errorMessage;
 		protected ServerActionErrorCode errorCode;
 		public bool actionComplete;
 		public System.Object actionReturn;
@@ -1420,6 +1423,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
             metaMessage.lastActionObjectType = lastActionObjectType;
 			metaMessage.lastActionRceptacleObjectId = lastActionRceptacleObjectId;
 			metaMessage.lastActionReceptacleObjectType = lastActionReceptacleObjectType;
+            metaMessage.lastActionX = lastActionX;
+            metaMessage.lastActionY = lastActionY;
+            metaMessage.lastActionZ = lastActionZ;
             metaMessage.errorMessage = errorMessage;
 
             //Console.WriteLine(String.Format("In BaseFPSAgentController.generateMetadataWrapper(), metaMessage.lastAction is {0}, metaMessage.lastActionObjectName is {1}",
@@ -1512,6 +1518,9 @@ namespace UnityStandardAssets.Characters.FirstPerson
 			lastActionObjectType = controlCommand.objectType;
 			lastActionRceptacleObjectId = controlCommand.receptacleObjectId;
 			lastActionReceptacleObjectType = controlCommand.receptacleObjectType;
+            lastActionX = controlCommand.x;
+            lastActionY = controlCommand.y;
+            lastActionZ = controlCommand.z;
 
             //Console.WriteLine(String.Format("In BaseFPSAgentController.ProcessControlCommand(), lastAction is {0}, lastActionObjectName is {1}",
             //                                                lastAction, lastActionObjectName));

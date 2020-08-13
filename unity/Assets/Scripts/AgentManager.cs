@@ -1117,6 +1117,9 @@ public struct MetadataWrapper
 	public string lastActionObjectName;
 	public string lastActionReceptacleObjectType;
 	public string lastActionRceptacleObjectId;
+	public float lastActionX;
+	public float lastActionY;
+	public float lastActionZ;
 	public string errorMessage;
 	public string errorCode; // comes from ServerActionErrorCode
 	public bool lastActionSuccess;
