@@ -8,7 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/FloorPlan1_physics.unity
     guid: f6bb3645e5f82439f9b3d3a05df01528
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorPlan2_physics.unity
     guid: a5adff71cdb2b9d4ca40b1ae3c5b8261
   - enabled: 0
@@ -188,10 +188,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/FloorPlan301_physics.unity
     guid: 029c462b4c3b34331a1ab8eb47cbcf9a
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/FloorPlan302_physics.unity
     guid: c13e097be79ff4163833d1ab152d8c84
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/FloorPlan303_physics.unity
     guid: b4c6e98d9c188417fb895d7330975066
   - enabled: 0
@@ -221,7 +221,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/FloorPlan312_physics.unity
     guid: 979f12db537ec4536b0a0e1f35703376
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/FloorPlan313_physics.unity
     guid: 48bff463ad1584e48bd2c7bd930f3565
   - enabled: 0
@@ -260,7 +260,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/FloorPlan325_physics.unity
     guid: 582ea139aa0ca441db9f8aa0e54c9d7e
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/FloorPlan326_physics.unity
     guid: 91dcf286ecb0e4357a81b8d2255774b0
   - enabled: 0
@@ -323,10 +323,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/FloorPlan416_physics.unity
     guid: 08266912795b64195a86bc201924c0aa
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorPlan417_physics.unity
     guid: c3874010a1ab1433ca0ab0639cf80015
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorPlan418_physics.unity
     guid: 09ade66d2b4b8496b8d1426e3ab70a23
   - enabled: 0
