@@ -262,7 +262,7 @@ function($, _, bootstrap, UnityProgress) {
       }
 
       $('#end-tutorial-button').click(() => {
-        scene = 'FloorPlan326_physics';
+        scene = 'FloorPlan326_physics_modified';
         resetScene();
 
         $('#end-tutorial-button').css('display', 'none');
@@ -489,8 +489,8 @@ function($, _, bootstrap, UnityProgress) {
       window.onUnityMovement = function(movement) {
         let jsonMovement = JSON.parse(movement);
         // FIRST init event
-        // console.log('Unity Movement:');
-        // console.log(jsonMovement);
+        console.log('Unity Movement:');
+        console.log(jsonMovement);
       };
 
       // Aggregate data

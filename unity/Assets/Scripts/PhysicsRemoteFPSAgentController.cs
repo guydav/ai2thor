@@ -476,6 +476,7 @@ namespace UnityStandardAssets.Characters.FirstPerson {
         {
             bool result = true;
 
+
             //generate arc points in the positive y axis rotation
             foreach(Vector3 v in corners)
             {

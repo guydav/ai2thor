@@ -371,4 +371,16 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/FloorPlan501_physics.unity
     guid: 554843188b21bb94e9c27e96f6e91a79
+  - enabled: 1
+    path: Assets/Scenes/FloorPlan326_physics_semi_sparse.unity
+    guid: 49b2b8ccb524340a891afddd973c88d2
+  - enabled: 1
+    path: Assets/Scenes/FloorPlan326_physics_super_sparse.unity
+    guid: 6255755fccd7d459baf1b94ec27fce02
+  - enabled: 1
+    path: Assets/Scenes/FloorPlan326_physics_super_sparse_many_objects.unity
+    guid: 29554eb4e2552404ebccf3f9ebc98e55
+  - enabled: 1
+    path: Assets/Scenes/FloorPlan326_physics_super_sparse_few_objects.unity
+    guid: 6d7c2b339b6cf47f8b947d2413fbed58
   m_configObjects: {}

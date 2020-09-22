@@ -955,7 +955,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
         }
 
-        protected bool checkIfSceneBoundsContainTargetPosition(Vector3 position) {
+        public bool checkIfSceneBoundsContainTargetPosition(Vector3 position) {
             if (!sceneBounds.Contains(position)) {
                 errorMessage = "Scene bounds do not contain target position: " + position;
                 return false;

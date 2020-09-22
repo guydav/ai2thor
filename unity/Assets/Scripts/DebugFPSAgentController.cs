@@ -265,7 +265,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                         {
                             action = "MoveHandDelta",
                             objectName = heldObject.name,
-                            x = scrollAmount.x * 0.05f,
+                            // Removing support for scrolling an object sideways, as it's non-intuitive
+                            x = 0, //x = scrollAmount.x * 0.05f, 
                             z = scrollAmount.y * -0.05f,
                             y = 0,
                         };
@@ -276,7 +277,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
         }
 
-	private void GetInput(out float speed)
+	    private void GetInput(out float speed)
 		{
 			// Read input
 			float horizontal = CrossPlatformInputManager.GetAxis("Horizontal");
@@ -307,7 +308,35 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
 		private void MouseRotateView()
 		{
-   			m_MouseLook.LookRotation (transform, m_Camera.transform);
+            // ??? why are these backward? at least they were in the code in MouseLook.cs
+            float xRot = CrossPlatformInputManager.GetAxis("Mouse X") * m_MouseLook.XSensitivity;
+            float yRot = CrossPlatformInputManager.GetAxis("Mouse Y") * m_MouseLook.YSensitivity;
+
+            if (xRot != 0 || yRot != 0)
+            {
+                bool canRotateX = true;
+                bool canRotateY = true;
+                string directionX = "";
+                string directionY = "";
+                if (xRot != 0)
+                {
+                    directionX = xRot > 0 ? "right" : "left";
+                    canRotateX = PhysicsController.CheckIfAgentCanRotate(directionX, xRot);
+                }
+                if (yRot != 0)
+                {
+                    directionY = yRot > 0 ? "up" : "down";
+                    canRotateY = canRotateY && PhysicsController.CheckIfAgentCanRotate(directionY, yRot);
+                }
+                
+                Console.WriteLine(String.Format("Mouse rotation | x: {0} | directionX: {1} | canRotateX: {2} | y: {3} | directionY: {4} | canRotateY: {5}",
+                    xRot, directionX, canRotateX, yRot, directionY, canRotateY));
+                if (canRotateX && canRotateY)
+                {
+                    m_MouseLook.LookRotation(transform, m_Camera.transform);
+                }
+
+            }
 		}
 
         private void FPSInput()
@@ -326,46 +355,79 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 m_CharacterController.height / 2f, Physics.AllLayers, QueryTriggerInteraction.Ignore);
             desiredMove = Vector3.ProjectOnPlane(desiredMove, hitInfo.normal).normalized;
 
-            m_MoveDir.x = desiredMove.x * speed;
-            m_MoveDir.z = desiredMove.z * speed;
-
-            //if (m_Input != Vector2.zero)
-            //{
-                //Console.WriteLine(String.Format("Speed: {0}, m_Input: {1}, desiredMove: {2}, m_MoveDir: {3}",
-                //    speed, m_Input, desiredMove, m_MoveDir));
-                //Console.WriteLine(String.Format("isWalking: {0}, m_WalkSpeed: {1}, m_RunSpeed: {2}, m_CustomSpeedFactor: {3}",
-                    //m_IsWalking, m_WalkSpeed, m_RunSpeed, m_CustomSpeedFactor));
-            //}
-            
+            //m_MoveDir.x = desiredMove.x * speed;
+            //m_MoveDir.z = desiredMove.z * speed;
+            // before it wasn't writing y, so it was adding the effect of gravity (see below), which would continue accumulating in the negative y direction
+            m_MoveDir = desiredMove * speed;  
 
             // if(!FlightMode)
             m_MoveDir += Physics.gravity * m_GravityMultiplier * Time.fixedDeltaTime;
 
+            // Copied over from BaseFPSAgenController.moveInDirection for controller movement purposes
+            float angle = Vector3.Angle(transform.forward, Vector3.Normalize(m_MoveDir));
+            float right = Vector3.Dot(transform.right, m_MoveDir);
+            if (right < 0)
+            {
+                angle = 360f - angle;
+            }
+            int angleInt = Mathf.RoundToInt(angle) % 360;
+
+            //if (m_Input != Vector2.zero)
+            //{
+            //Console.WriteLine(String.Format("Speed: {0}, m_Input: {1}, desiredMove: {2}, m_MoveDir: {3}",
+            //    speed, m_Input, desiredMove, m_MoveDir));
+            //Console.WriteLine(String.Format("isWalking: {0}, m_WalkSpeed: {1}, m_RunSpeed: {2}, m_CustomSpeedFactor: {3}",
+            //m_IsWalking, m_WalkSpeed, m_RunSpeed, m_CustomSpeedFactor));
+            //}
+
             //added this check so that move is not called if/when the Character Controller's capsule is disabled. Right now the capsule is being disabled when open/close animations are in progress so yeah there's that
             if(m_CharacterController.enabled == true) {
-		        CollisionFlags movementResult = m_CharacterController.Move(m_MoveDir * Time.fixedDeltaTime);
+                // Trying to mimic some of the move validation logic
+                Vector3 moveDelta = m_MoveDir * Time.fixedDeltaTime;
+                Vector3 targetPosition = transform.position + moveDelta;
 
-		        #if UNITY_WEBGL
-		        JavaScriptInterface jsInterface = this.GetComponent<JavaScriptInterface>();
-	            if ((jsInterface != null) && (math.any(m_Input))) {
-					MovementWrapper movement = new MovementWrapper();
-					movement.position = transform.position;
-					movement.rotationEulerAngles = transform.rotation.eulerAngles;
-					movement.direction = m_MoveDir;
-					movement.targetPosition = desiredMove;
-					movement.input = m_Input;
-                    //movement.succeeded = movementResult == CollisionFlags.None;
-                    movement.touchingSide = (movementResult & CollisionFlags.Sides) != 0;
-                    movement.touchingCeiling = (movementResult & CollisionFlags.Above) != 0;
-                    movement.touchingFloor = (movementResult & CollisionFlags.Below) != 0;
+                if (PhysicsController.checkIfSceneBoundsContainTargetPosition(targetPosition) &&
+                    PhysicsController.CheckIfItemBlocksAgentMovement(moveDelta.magnitude, angleInt, false) &&
+                    PhysicsController.CheckIfAgentCanMove(moveDelta.magnitude, angleInt))
+                {
+                    CollisionFlags movementResult = m_CharacterController.Move(moveDelta);
 
-                    jsInterface.SendMovementData(movement);
+
+                    #if UNITY_WEBGL
+                    JavaScriptInterface jsInterface = this.GetComponent<JavaScriptInterface>();
+                    if ((jsInterface != null) && (math.any(m_Input)))
+                    {
+                        MovementWrapper movement = new MovementWrapper
+                        {
+                            position = transform.position,
+                            rotationEulerAngles = transform.rotation.eulerAngles,
+                            direction = m_MoveDir,
+                            targetPosition = desiredMove,
+                            input = m_Input,
+                            //movement.succeeded = movementResult == CollisionFlags.None;
+                            touchingSide = (movementResult & CollisionFlags.Sides) != 0,
+                            touchingCeiling = (movementResult & CollisionFlags.Above) != 0,
+                            touchingFloor = (movementResult & CollisionFlags.Below) != 0
+                        };
+
+                        jsInterface.SendMovementData(movement);
+                    }
+                    #endif
                 }
-			    #endif
-			}
-
-
-
+                else if (math.any(m_Input))
+                {
+                    Console.WriteLine(String.Format("Move failed: {0} && {1} && {2}",
+                        PhysicsController.checkIfSceneBoundsContainTargetPosition(targetPosition),
+                        PhysicsController.CheckIfItemBlocksAgentMovement(moveDelta.magnitude, angleInt, false),
+                        PhysicsController.CheckIfAgentCanMove(moveDelta.magnitude, angleInt)));
+                    Console.WriteLine(String.Format("Current position: {0} | desired move: {1} | move direction: {2} | move delta: {3} Target position: {4} | move magnitude: {5} | angleInt: {6}",
+                        transform.position, desiredMove, m_MoveDir, moveDelta, targetPosition, moveDelta.magnitude, angleInt));
+                    if (!PhysicsController.checkIfSceneBoundsContainTargetPosition(targetPosition))
+                    {
+                        Console.WriteLine(String.Format("Scene bounds: {0}", PhysicsController.sceneBounds));
+                    }
+                }
+            }
 		}
 
 
