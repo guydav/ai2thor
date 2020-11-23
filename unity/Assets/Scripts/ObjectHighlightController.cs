@@ -26,11 +26,15 @@ namespace UnityStandardAssets.Characters.FirstPerson {
 
     public class ObjectHighlightController
 	{
+        public const float DEFAULT_MAX_CHARGE_THROW_SECONDS = 1f;  // 1.4f;
+        public const float DEFAULT_MAX_THROW_FORCE = 300f;  // 1000.0f;
+
+
         [SerializeField] private Text TargetText = null;
         [SerializeField] private Slider ThrowForceBarSlider = null;
         [SerializeField] private float MinHighlightDistance = 5f;
-        [SerializeField] private float MaxChargeThrowSeconds = 1.4f;
-        [SerializeField] private float MaxThrowForce = 1000.0f;
+        [SerializeField] private float MaxChargeThrowSeconds = DEFAULT_MAX_CHARGE_THROW_SECONDS;  // 1.4f;
+        [SerializeField] private float MaxThrowForce = DEFAULT_MAX_THROW_FORCE; // 1000.0f;
         [SerializeField] private bool DisplayTargetText = true;
         [SerializeField] private HighlightConfig HighlightParams = new HighlightConfig {
             TextStrongColor = new Color(1.0f, 1.0f, 1.0f, 1.0f),
@@ -71,12 +75,14 @@ namespace UnityStandardAssets.Characters.FirstPerson {
             float minHighlightDistance,
             bool highlightEnabled = true,
             bool throwEnabled = true,
-            float maxThrowForce = 1000.0f,
-            float maxChargeThrowSeconds = 1.4f,
+            float maxThrowForce = DEFAULT_MAX_CHARGE_THROW_SECONDS,
+            float maxChargeThrowSeconds = DEFAULT_MAX_THROW_FORCE,
             bool highlightWhileHolding = false,
             HighlightConfig highlightConfig = null
         )   
         {
+            Console.WriteLine(String.Format("ObjectHighlighterController Constructor: maxThrowForce = {0} | maxChargeThrowSeconds = {1}",
+                                                        maxThrowForce, maxChargeThrowSeconds));
             this.PhysicsController = physicsController;
             this.MinHighlightDistance = minHighlightDistance;
             this.MaxThrowForce = maxThrowForce;
@@ -241,9 +247,10 @@ namespace UnityStandardAssets.Characters.FirstPerson {
                     if (this.PhysicsController.WhatAmIHolding() != null)
                     {
                         var diff = Time.time - this.timerAtPress;
-                        var clampedForceTime = Mathf.Min(diff * diff, MaxChargeThrowSeconds);
-                        var force = clampedForceTime * MaxThrowForce / MaxChargeThrowSeconds;
-
+                        var clampedForceTime = Mathf.Min(diff * diff, this.MaxChargeThrowSeconds);
+                        var force = clampedForceTime * this.MaxThrowForce / this.MaxChargeThrowSeconds;
+                        Console.WriteLine(String.Format("Throwing: diff = {0} | clampedTime = {1} | force = {2} | maxThrowForce = {3} | maxChargeThrowSeconds = {4}",
+                                                        diff, clampedForceTime, force, this.MaxThrowForce, this.MaxChargeThrowSeconds));
                         if (this.PhysicsController.actionComplete && (!this.highlightWhileHolding || (highlightedObject != null && this.PhysicsController.WhatAmIHolding() == highlightedObject.gameObject)))
                         {
                             ServerAction action;

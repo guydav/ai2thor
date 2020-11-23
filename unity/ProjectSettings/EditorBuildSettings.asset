@@ -6,6 +6,15 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/FloorPlan326_physics_semi_sparse_new_objects.unity
+    guid: ffde6148b374249c8a33b9e85b5cf2db
+  - enabled: 1
+    path: Assets/Scenes/FloorPlan326_physics_semi_sparse_few_new_objects.unity
+    guid: 49b2b8ccb524340a891afddd973c88d2
+  - enabled: 1
+    path: Assets/Scenes/FloorPlan326_physics_semi_sparse_many_new_objects.unity
+    guid: 647d67a65dcb04d418fba57c704b0bba
+  - enabled: 1
     path: Assets/Scenes/FloorPlan1_physics.unity
     guid: f6bb3645e5f82439f9b3d3a05df01528
   - enabled: 0
@@ -188,10 +197,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/FloorPlan301_physics.unity
     guid: 029c462b4c3b34331a1ab8eb47cbcf9a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorPlan302_physics.unity
     guid: c13e097be79ff4163833d1ab152d8c84
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorPlan303_physics.unity
     guid: b4c6e98d9c188417fb895d7330975066
   - enabled: 0
@@ -221,7 +230,7 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/FloorPlan312_physics.unity
     guid: 979f12db537ec4536b0a0e1f35703376
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorPlan313_physics.unity
     guid: 48bff463ad1584e48bd2c7bd930f3565
   - enabled: 0
@@ -371,16 +380,16 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/FloorPlan501_physics.unity
     guid: 554843188b21bb94e9c27e96f6e91a79
-  - enabled: 1
-    path: Assets/Scenes/FloorPlan326_physics_semi_sparse.unity
-    guid: 49b2b8ccb524340a891afddd973c88d2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorPlan326_physics_super_sparse.unity
     guid: 6255755fccd7d459baf1b94ec27fce02
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorPlan326_physics_super_sparse_many_objects.unity
     guid: 29554eb4e2552404ebccf3f9ebc98e55
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/FloorPlan326_physics_super_sparse_few_objects.unity
     guid: 6d7c2b339b6cf47f8b947d2413fbed58
+  - enabled: 0
+    path: Assets/Scenes/FloorPlan326_physics_new_objects.unity
+    guid: 41d19e7210bc140e59fd3c1bab73fde7
   m_configObjects: {}

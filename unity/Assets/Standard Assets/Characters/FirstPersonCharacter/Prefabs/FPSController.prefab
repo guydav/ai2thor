@@ -137,8 +137,8 @@ MonoBehaviour:
   Debug_Canvas: {fileID: 0}
   InputMode_Text: {fileID: 0}
   MaxViewDistance: 5
-  MaxChargeThrowSeconds: 1.4
-  MaxThrowForce: 1000
+  MaxChargeThrowSeconds: 1
+  MaxThrowForce: 500
   FPSEnabled: 1
   InputFieldObj: {fileID: 0}
 --- !u!114 &114749714472260818

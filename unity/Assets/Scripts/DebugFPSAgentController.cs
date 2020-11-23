@@ -31,8 +31,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
 //        [SerializeField] private GameObject Inventory_Text = null;
 		[SerializeField] protected GameObject InputMode_Text = null;
         [SerializeField] protected float MaxViewDistance = 5.0f;
-        [SerializeField] private float MaxChargeThrowSeconds = 1.4f;
-        [SerializeField] private float MaxThrowForce = 1000.0f;
+        [SerializeField] private float MaxChargeThrowSeconds = ObjectHighlightController.DEFAULT_MAX_CHARGE_THROW_SECONDS;
+        [SerializeField] private float MaxThrowForce = ObjectHighlightController.DEFAULT_MAX_THROW_FORCE;
+        [SerializeField] private Space objectRotateRelativeTo = Space.Self;
+        [SerializeField] private float objectRotateStep = -10.0f;
         // public bool FlightMode = false;
 
         public bool FPSEnabled = true;
@@ -131,7 +133,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 Debug_Canvas = GameObject.Find("DebugCanvasPhysics");
 
                 Debug_Canvas.GetComponent<Canvas>().enabled = true;
-
         }
 
         public void OnDisable()
@@ -203,7 +204,6 @@ namespace UnityStandardAssets.Characters.FirstPerson
 
             }
 
-
             if (Input.GetKeyDown(KeyCode.R))
             {
                 var action = new ServerAction
@@ -217,18 +217,99 @@ namespace UnityStandardAssets.Characters.FirstPerson
                 PhysicsController.ProcessControlCommand(action);
             }
 
-            if(Input.GetKey(KeyCode.Space))
+            //if(Input.GetKey(KeyCode.Space))
+            //{
+            //    Cursor.visible = true;
+            //    Cursor.lockState = CursorLockMode.None;
+            //}
+
+            //if(Input.GetKeyUp(KeyCode.Space))
+            //{
+            //    Cursor.visible = false;
+            //    Cursor.lockState = CursorLockMode.Locked;
+            //}
+
+            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl) || Input.GetKeyDown(KeyCode.C))
             {
-                Cursor.visible = true;
-                Cursor.lockState = CursorLockMode.None;
+                String act;
+                if (PhysicsController.isStanding())
+                {
+                    act = "Crouch";
+                }
+                else
+                {
+                    act = "Stand";
+                }
+                var action = new ServerAction
+                {
+                    action = act,
+                };
+                this.PhysicsController.ProcessControlCommand(action);
+            }
+        }
+
+        private void RotateHeldObjectControls()
+        {
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                if (this.objectRotateRelativeTo == Space.Self)
+                {
+                    this.objectRotateRelativeTo = Space.World;
+                } else
+                {
+                    this.objectRotateRelativeTo = Space.Self;
+                }
+                Console.WriteLine(String.Format("Switching rotation orientation to {0}", this.objectRotateRelativeTo));
             }
 
-            if(Input.GetKeyUp(KeyCode.Space))
+
+            var action = new ServerAction
             {
-                Cursor.visible = false;
-                Cursor.lockState = CursorLockMode.Locked;
+                action = "RotateObject",
+                relativeTo = this.objectRotateRelativeTo
+            };
+            bool rotate = false;
+
+            if (Input.GetKey(KeyCode.T))
+            {
+                rotate = true;
+                action.x = -this.objectRotateStep;
             }
-		}
+            else if (Input.GetKey(KeyCode.Y))
+            {
+                rotate = true;
+                action.x = this.objectRotateStep;
+            }
+
+            if (Input.GetKey(KeyCode.G))
+            {
+                rotate = true;
+                action.y = -this.objectRotateStep;
+            }
+            else if (Input.GetKey(KeyCode.H))
+            {
+                rotate = true;
+                action.y = this.objectRotateStep;
+            }
+
+            if (Input.GetKey(KeyCode.B))
+            {
+                rotate = true;
+                action.z = -this.objectRotateStep;
+            }
+            else if (Input.GetKey(KeyCode.N))
+            {
+                rotate = true;
+                action.z = this.objectRotateStep;
+            }
+
+            if (rotate)
+            {
+                Console.WriteLine(String.Format("Sending rotate control command: {0},{1},{2} | {3}",
+                    action.x, action.y, action.z, action.relativeTo));
+                this.PhysicsController.ProcessControlCommand(action);
+            }
+        }
 
 		private void Update()
         {
@@ -236,10 +317,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             highlightController.MouseControls();
 
 			DebugKeyboardControls();
-
+            RotateHeldObjectControls();
             ///////////////////////////////////////////////////////////////////////////
-			//we are not in focus mode, so use WASD and mouse to move around
-			if(FPSEnabled)
+            //we are not in focus mode, so use WASD and mouse to move around
+            if (FPSEnabled)
 			{
 				FPSInput();
 				if(Cursor.visible == false)
@@ -329,8 +410,8 @@ namespace UnityStandardAssets.Characters.FirstPerson
                     canRotateY = canRotateY && PhysicsController.CheckIfAgentCanRotate(directionY, yRot);
                 }
                 
-                Console.WriteLine(String.Format("Mouse rotation | x: {0} | directionX: {1} | canRotateX: {2} | y: {3} | directionY: {4} | canRotateY: {5}",
-                    xRot, directionX, canRotateX, yRot, directionY, canRotateY));
+                //Console.WriteLine(String.Format("Mouse rotation | x: {0} | directionX: {1} | canRotateX: {2} | y: {3} | directionY: {4} | canRotateY: {5}",
+                //    xRot, directionX, canRotateX, yRot, directionY, canRotateY));
                 if (canRotateX && canRotateY)
                 {
                     m_MouseLook.LookRotation(transform, m_Camera.transform);

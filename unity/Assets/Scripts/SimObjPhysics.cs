@@ -654,11 +654,11 @@ public class SimObjPhysics : MonoBehaviour, SimpleSimObj
 		top.transform.position = prefabRoot.transform.position;
 		top.transform.rotation = prefabRoot.transform.rotation;
         prefabRoot.name = "mesh";
-
 		prefabRoot.transform.SetParent(top.transform);
 
 		SimObjPhysics sop = top.AddComponent<SimObjPhysics>();
-
+		sop.Type = (SimObjType)Enum.Parse(typeof(SimObjType), top.name);
+		sop.PrimaryProperty = SimObjPrimaryProperty.CanPickup;
 		sop.ContextSetUpSimObjPhysics();
 	}
 
@@ -2165,5 +2165,13 @@ public class SimObjPhysics : MonoBehaviour, SimpleSimObj
 				BoundingBox.GetComponent<BoxCollider>().enabled = false;
 		}
 	}
-	#endif
+#endif
+
+	[ContextMenu("Setup Object ID")]
+	void SetupObjectID()
+	{
+		Vector3 pos = transform.position;
+		objectID = String.Format("{0:g}|{1:00.##}|{2:00.##}|{3:00.##}",
+			Type, pos.x, pos.y, pos.z);
+	}
 }

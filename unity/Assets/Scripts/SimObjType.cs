@@ -265,6 +265,23 @@ public enum SimObjType : int
     Desktop = 157,
     TargetCircle = 158,
     Floor = 159,
+	// Trial objects I'm messing around with
+	ToyBall = 160,
+	Hamburger = 161,
+	TriangleBlock = 162,
+	CubeBlock = 163,
+	SemiCircleBlock = 164,
+	CylinderBlock = 165,
+	PyramidBlock = 166,
+	LongCylinderBlock = 167,
+	BridgeBlock = 168,
+	FlatRectBlock = 169,
+	TallRectBlock = 170,
+	Dodgeball = 171,
+	Beachball = 172,
+	Golfball = 173,
+	SmallSlide = 174,
+	CurvedRamp = 175,
 }
 
 public static class ReceptacleRestrictions

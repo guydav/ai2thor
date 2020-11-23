@@ -43,7 +43,7 @@ public class PhysicsSceneManager : MonoBehaviour
     //this is used to report if the scene is at rest in metadata, and also to automatically resume Physics Autosimulation if
     //physics simulation was paused
     public bool isSceneAtRest;//if any object in the scene has a non zero velocity, set to false
-   public List<Rigidbody> rbsInScene = null;//list of all active rigidbodies in the scene
+    public List<Rigidbody> rbsInScene = null;//list of all active rigidbodies in the scene
 
 	private void OnEnable()
 	{
@@ -60,7 +60,8 @@ public class PhysicsSceneManager : MonoBehaviour
 		}
 	}
 
-	public void SetupScene()
+    [ContextMenu("Set Up Scene")]
+    public void SetupScene()
 	{
 		ReceptaclesInScene.Clear();
 		ObjectIdToSimObjPhysics.Clear();

@@ -513,6 +513,8 @@ namespace UnityStandardAssets.Characters.FirstPerson {
                                 continue;
                             }
 
+                            Console.WriteLine(String.Format("checkArcForCollisions collided with {0}", hit.transform.name));
+
                             result = false;
                             break;
                         }
@@ -3554,7 +3556,8 @@ public void PickupObject(ServerAction action) //use serveraction objectid
                 PickupContainedObjects(target);
             target.transform.position = AgentHand.transform.position;
             // target.transform.rotation = AgentHand.transform.rotation; - keep this line if we ever want to change the pickup position to be constant relative to the Agent Hand and Agent Camera rather than aligned by world axis
-            target.transform.rotation = transform.rotation;
+            // GD: trying to comment the below line out to pick up in the same orientation
+            //target.transform.rotation = transform.rotation;
             target.transform.SetParent(AgentHand.transform);
             ItemInHand = target.gameObject;
             if (!action.forceAction && isHandObjectColliding(true)) {
@@ -3792,8 +3795,27 @@ public void PickupObject(ServerAction action) //use serveraction objectid
 
         }
 
-        //Hide and Seek helper function, makes overlap box at x,z coordinates
-        protected HashSet<SimObjPhysics> objectsInBox(float x, float z) {
+        public void RotateObject(ServerAction action)
+        {
+            Console.WriteLine(String.Format("Handling rotate control command: {0},{1},{2} | {3} | {4}",
+                    action.x, action.y, action.z, action.relativeTo, ItemInHand.transform.name));
+
+            if (ItemInHand == null)
+            {
+                errorMessage = "Nothing in hand to rotate!";
+                Debug.Log(errorMessage);
+                actionFinished(false);
+                return;
+            }
+
+            // TODO: GD: do I want to check here if this creates a collision?
+            // If so, I should look at checkArcForCollisions
+            ItemInHand.transform.Rotate(action.x, action.y, action.z, action.relativeTo);
+            actionFinished(true);
+        }
+
+            //Hide and Seek helper function, makes overlap box at x,z coordinates
+            protected HashSet<SimObjPhysics> objectsInBox(float x, float z) {
             Collider[] colliders = Physics.OverlapBox(
                 new Vector3(x, 0f, z),
                 new Vector3(0.125f, 10f, 0.125f),
@@ -4965,6 +4987,7 @@ public void PickupObject(ServerAction action) //use serveraction objectid
         }
 
         public void Crouch(ServerAction action) {
+            Debug.Log("Crouch reached");
             if (!isStanding()) {
                 errorMessage = "Already crouching.";
                 actionFinished(false);
@@ -4982,6 +5005,7 @@ public void PickupObject(ServerAction action) //use serveraction objectid
         }
 
         public void Stand(ServerAction action) {
+            Debug.Log("Stand reached");
             if (isStanding()) {
                 errorMessage = "Already standing.";
                 actionFinished(false);

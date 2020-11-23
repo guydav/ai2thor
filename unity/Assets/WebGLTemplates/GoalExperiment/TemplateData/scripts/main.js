@@ -34,7 +34,7 @@ function($, _, bootstrap, UnityProgress) {
       window.game_url = 'build' in getParams ? `${window.game_build}/Build/thor-local-WebGL.json` : window.game_url;
       let scene = getParams['scene'];
       if (!scene) {
-        scene = 'FloorPlan302_physics';
+        scene = 'FloorPlan326_physics_semi_sparse_new_objects';
       }
       console.log("GAME URL: ", window.game_url);
       let hider = getParams['role'] !== 'seeker';

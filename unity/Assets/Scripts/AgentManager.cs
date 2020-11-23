@@ -360,7 +360,7 @@ public class AgentManager : MonoBehaviour
 		yield return null;
 
 		if (string.IsNullOrEmpty(response.sceneName)){
-			UnityEngine.SceneManagement.SceneManager.LoadScene (UnityEngine.SceneManagement.SceneManager.GetActiveScene ().name);
+			UnityEngine.SceneManagement.SceneManager.LoadScene (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
 		} else {
 			UnityEngine.SceneManagement.SceneManager.LoadScene (response.sceneName);
 		}
@@ -1184,10 +1184,10 @@ public class ServerAction
 	public string objectId;
 	public int agentId;
 	public int thirdPartyCameraId;
-	public float y;
 	public float fieldOfView;
-	public float x;
-	public float z;
+	public float x = 0f;
+	public float y = 0f;
+	public float z = 0f;
     public float pushAngle;
 	public int horizon;
 	public Vector3 rotation;
@@ -1264,6 +1264,7 @@ public class ServerAction
     public bool orthographic = false;
 
     public bool grid = false;
+	public Space relativeTo = Space.Self;
 
     public Color? gridColor;
 
